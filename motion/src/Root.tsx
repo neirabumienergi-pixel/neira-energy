@@ -4,6 +4,7 @@ import { Government } from "./Government";
 import { Community } from "./Community";
 import { EpcPartnership } from "./EpcPartnership";
 import { Residential } from "./Residential";
+import { Hero } from "./Hero";
 
 const common = { durationInFrames: 390, fps: 30, width: 1080, height: 1080 };
 
@@ -15,6 +16,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition id="Community" component={Community} {...common} />
       <Composition id="EpcPartnership" component={EpcPartnership} {...common} />
       <Composition id="Residential" component={Residential} {...common} />
+      <Composition id="Hero" component={Hero} {...common} durationInFrames={300} />
     </>
   );
 };

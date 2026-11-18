@@ -10,6 +10,7 @@ import {
   SegmentConfig,
   SegmentScene,
   grid,
+  wave,
 } from "./scene/SegmentScene";
 
 const HOUSE = {
@@ -20,11 +21,11 @@ const HOUSE = {
 };
 
 // ---- Fishing boat with a solar canopy ----
-const BOAT = { x: 10.4, y: 15.9, L: 4, W: 1.4 };
+export const BOAT = { x: 10.4, y: 15.9, L: 4, W: 1.4 };
 
-const Boat = ({ t, frame, on, glintX }: { t: number; frame: number; on: number; glintX: number }) => {
+export const Boat = ({ t, frame, on, glintX }: { t: number; frame: number; on: number; glintX: number }) => {
   const { x: bx, y: by, L, W } = BOAT;
-  const bob = Math.sin(frame / 12) * 0.08;
+  const bob = wave(frame, 75) * 0.08;
   const z0 = -0.1 + bob;
   const zr = z0 + 0.55;
   const rim: P3[] = [
