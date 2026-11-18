@@ -53,6 +53,8 @@ export type Building = {
   gable?: { h: number; front: string; back: string };
 };
 
+export type Rect = { x: number; y: number; w: number; d: number };
+
 export type ExtraCtx = {
   t: number; // grow-in progress 0..1
   frame: number;
@@ -63,7 +65,7 @@ export type ExtraCtx = {
 /** Custom scene object (boat, water tower, ...) */
 export type Extra = {
   id: string;
-  fp: { x: number; y: number; w: number; d: number };
+  fp: Rect | ((frame: number) => Rect);
   delay: number;
   label?: { text: string; anchor: P3; start?: number };
   render: (ctx: ExtraCtx) => React.ReactNode;
@@ -160,7 +162,6 @@ export const grid = (
   return out;
 };
 
-type Rect = { x: number; y: number; w: number; d: number };
 
 const panelGrid = (
   area: Rect,
@@ -615,9 +616,10 @@ export const SegmentScene: React.FC<{ config: SegmentConfig }> = ({ config }) =>
     if (t <= 0.001) return;
     const a = arriveAt(ex.id);
     const on = interpolate(frame, [a, a + 18], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+    const fp = typeof ex.fp === "function" ? ex.fp(frame) : ex.fp;
     items.push({
-      depth: ex.fp.x + ex.fp.w + ex.fp.y + ex.fp.d,
-      fp: ex.fp,
+      depth: fp.x + fp.w + fp.y + fp.d,
+      fp,
       node: <g key={`x${ex.id}`}>{ex.render({ t, frame, on, glintX })}</g>,
     });
   });
