@@ -49,6 +49,24 @@ export type Building = {
   panels?: boolean;
   windows?: (b: Box) => P3[][];
   accents?: (b: Box) => { poly: P3[]; fill: string }[];
+  /** pitched roof, ridge along x; panels go on the front (+y) slope */
+  gable?: { h: number; front: string; back: string };
+};
+
+export type ExtraCtx = {
+  t: number; // grow-in progress 0..1
+  frame: number;
+  on: number; // energy arrived 0..1
+  glintX: number;
+};
+
+/** Custom scene object (boat, water tower, ...) */
+export type Extra = {
+  id: string;
+  fp: { x: number; y: number; w: number; d: number };
+  delay: number;
+  label?: { text: string; anchor: P3; start?: number };
+  render: (ctx: ExtraCtx) => React.ReactNode;
 };
 
 /** Ground-mounted solar array */
@@ -76,6 +94,43 @@ export type SegmentConfig = {
   lamps?: Lamp[];
   lampLabel?: { text: string; index: number };
   flags?: Flag[];
+  extras?: Extra[];
+  /** water area on the ground (assumed to reach the front-left edge y=18) */
+  water?: { x: number; y: number; w: number; d: number };
+  roads?: { x: number; y: number; w: number; d: number }[];
+  groundDecor?: { poly: P3[]; fill: string }[];
+};
+
+export const shineFill = (sx: number, glintX: number) =>
+  interpolateColors(Math.exp(-(((sx - glintX) / 70) ** 2)), [0, 1], ["#1f3f72", "#8fb8f0"]);
+
+/** Generic solar panel quad: corners [backL, backR, frontR, frontL] */
+export const PanelQuad: React.FC<{ poly: P3[]; glintX: number; opacity?: number }> = ({
+  poly,
+  glintX,
+  opacity = 1,
+}) => {
+  const c: P3 = [
+    (poly[0][0] + poly[2][0]) / 2,
+    (poly[0][1] + poly[2][1]) / 2,
+    (poly[0][2] + poly[2][2]) / 2,
+  ];
+  const [sx] = iso(c);
+  const lines: [P3, P3][] = [
+    [mix(poly[0], poly[1], 1 / 3), mix(poly[3], poly[2], 1 / 3)],
+    [mix(poly[0], poly[1], 2 / 3), mix(poly[3], poly[2], 2 / 3)],
+    [mix(poly[0], poly[3], 0.5), mix(poly[1], poly[2], 0.5)],
+  ];
+  return (
+    <g opacity={opacity}>
+      <polygon points={pts(poly)} fill={shineFill(sx, glintX)} stroke="#c9d9ee" strokeWidth={1} strokeLinejoin="round" />
+      {lines.map(([a, b], k) => {
+        const [x1, y1] = iso(a);
+        const [x2, y2] = iso(b);
+        return <line key={k} x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(201,217,238,0.55)" strokeWidth={0.7} />;
+      })}
+    </g>
+  );
 };
 
 // ---------- helpers ----------
@@ -163,7 +218,7 @@ const mix = (a: P3, c: P3, k: number): P3 => [
   a[2] + (c[2] - a[2]) * k,
 ];
 
-const BoxShape: React.FC<{ b: Box; p: Palette; stroke?: string }> = ({
+export const BoxShape: React.FC<{ b: Box; p: Palette; stroke?: string }> = ({
   b,
   p,
   stroke = "rgba(8,63,34,0.18)",
@@ -316,7 +371,7 @@ export const SegmentScene: React.FC<{ config: SegmentConfig }> = ({ config }) =>
       labels.push({
         id: bd.id,
         text: bd.label,
-        anchor: [bd.box.x + bd.box.w / 2, bd.box.y + bd.box.d / 2, bd.box.z + bd.box.h],
+        anchor: [bd.box.x + bd.box.w / 2, bd.box.y + bd.box.d / 2, bd.box.z + bd.box.h + (bd.gable?.h ?? 0)],
         start: (hasPanels ? panelStart : bd.delay + 60) + 18,
       });
     }
@@ -352,13 +407,49 @@ export const SegmentScene: React.FC<{ config: SegmentConfig }> = ({ config }) =>
           {(bd.accents?.(b) ?? []).map((a, i) => (
             <polygon key={`a${i}`} points={pts(a.poly)} fill={a.fill} />
           ))}
-          <polygon
-            points={pts(
-              topFace({ ...b, x: b.x + 0.18, y: b.y + 0.18, w: b.w - 0.36, d: b.d - 0.36 }),
-            )}
-            fill="rgba(8,63,34,0.06)"
-          />
-          {g >= 0.98
+          {bd.gable ? (
+            (() => {
+              const rh = bd.gable.h * g;
+              const T = roofZ;
+              const m = b.y + b.d / 2;
+              const S = (u: number, v: number, lift = 0): P3 => [
+                b.x + u * b.w,
+                b.y + b.d - (v * b.d) / 2,
+                T + v * rh + 0.06 + lift,
+              ];
+              const cols = Math.max(1, Math.floor((b.w - 0.4) / 1.0));
+              const slopePanels: [number, number][][] = [];
+              for (let c = 0; c < cols; c++) {
+                const u0 = 0.08 + (c * 0.84) / cols + 0.02;
+                const u1 = 0.08 + ((c + 1) * 0.84) / cols - 0.02;
+                slopePanels.push([[u0, 0.85], [u1, 0.85], [u1, 0.2], [u0, 0.2]]);
+              }
+              return (
+                <g strokeLinejoin="round" stroke="rgba(8,63,34,0.18)" strokeWidth={1}>
+                  <polygon points={pts([[b.x, b.y, T], [b.x + b.w, b.y, T], [b.x + b.w, m, T + rh], [b.x, m, T + rh]])} fill={bd.gable.back} />
+                  <polygon points={pts([[b.x + b.w, b.y, T], [b.x + b.w, b.y + b.d, T], [b.x + b.w, m, T + rh]])} fill={bd.palette.right} />
+                  <polygon points={pts([[b.x, b.y + b.d, T], [b.x + b.w, b.y + b.d, T], [b.x + b.w, m, T + rh], [b.x, m, T + rh]])} fill={bd.gable.front} />
+                  {hasPanels && g >= 0.98
+                    ? slopePanels.map((q, i) => {
+                        const p = spring({ frame: frame - (panelStart + i * 2), fps, config: { damping: 15, mass: 0.6 } });
+                        if (p <= 0.001) return null;
+                        const lift = (1 - p) * 5;
+                        const poly = q.map(([u, v]) => S(u, v, lift));
+                        return <PanelQuad key={i} poly={poly} glintX={glintX} opacity={Math.min(1, p * 1.5)} />;
+                      })
+                    : null}
+                </g>
+              );
+            })()
+          ) : (
+            <polygon
+              points={pts(
+                topFace({ ...b, x: b.x + 0.18, y: b.y + 0.18, w: b.w - 0.36, d: b.d - 0.36 }),
+              )}
+              fill="rgba(8,63,34,0.06)"
+            />
+          )}
+          {g >= 0.98 && !bd.gable
             ? panels.map((pn, i) => {
                 const p = spring({
                   frame: frame - (panelStart + i * 1.4),
@@ -510,6 +601,27 @@ export const SegmentScene: React.FC<{ config: SegmentConfig }> = ({ config }) =>
     });
   });
 
+  // Custom extras
+  (config.extras ?? []).forEach((ex) => {
+    const t = spring({ frame: frame - ex.delay, fps, config: { damping: 13, mass: 0.8 } });
+    if (ex.label) {
+      labels.push({
+        id: ex.id,
+        text: ex.label.text,
+        anchor: ex.label.anchor,
+        start: ex.label.start ?? ex.delay + 90,
+      });
+    }
+    if (t <= 0.001) return;
+    const a = arriveAt(ex.id);
+    const on = interpolate(frame, [a, a + 18], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+    items.push({
+      depth: ex.fp.x + ex.fp.w + ex.fp.y + ex.fp.d,
+      fp: ex.fp,
+      node: <g key={`x${ex.id}`}>{ex.render({ t, frame, on, glintX })}</g>,
+    });
+  });
+
   // Hub (inverter / energy centre)
   items.push({
     depth: HUB.x + HUB.w + HUB.y + HUB.d,
@@ -652,9 +764,48 @@ export const SegmentScene: React.FC<{ config: SegmentConfig }> = ({ config }) =>
                 </g>
               );
             })}
-            <polygon points={pts([[0, 7.3, 0], [18, 7.3, 0], [18, 8.0, 0], [0, 8.0, 0]])} fill="rgba(4,36,20,0.08)" />
-            <polygon points={pts([[8.9, 0, 0], [9.6, 0, 0], [9.6, 18, 0], [8.9, 18, 0]])} fill="rgba(4,36,20,0.06)" />
-
+            {(config.roads ?? [
+              { x: 0, y: 7.3, w: 18, d: 0.7 },
+              { x: 8.9, y: 0, w: 0.7, d: 18 },
+            ]).map((r, i) => (
+              <polygon
+                key={`road${i}`}
+                points={pts([[r.x, r.y, 0], [r.x + r.w, r.y, 0], [r.x + r.w, r.y + r.d, 0], [r.x, r.y + r.d, 0]])}
+                fill="rgba(4,36,20,0.07)"
+              />
+            ))}
+            {config.water
+              ? (() => {
+                  const w = config.water;
+                  return (
+                    <g>
+                      <polygon
+                        points={pts([[w.x, w.y + w.d, -0.8], [w.x + w.w, w.y + w.d, -0.8], [w.x + w.w, w.y + w.d, -0.1], [w.x, w.y + w.d, -0.1]])}
+                        fill="#5fa8cf"
+                      />
+                      <polygon
+                        points={pts([[w.x, w.y, -0.1], [w.x + w.w, w.y, -0.1], [w.x + w.w, w.y + w.d, -0.1], [w.x, w.y + w.d, -0.1]])}
+                        fill="#8cc9e6"
+                        stroke="#6fb3d6"
+                        strokeWidth={1}
+                      />
+                      {Array.from({ length: 9 }).map((_, i) => {
+                        const k = (i * 0.37) % 1;
+                        const yy = w.y + 0.4 + ((i * 1.3) % (w.d - 0.8));
+                        const xx = w.x + 1 + k * (w.w - 3) + Math.sin(frame / 25 + i) * 0.4;
+                        const [x1, y1] = iso([xx, yy, -0.1]);
+                        const [x2, y2] = iso([xx + 1.1, yy, -0.1]);
+                        return (
+                          <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#ffffff" strokeOpacity={0.6 + 0.3 * Math.sin(frame / 12 + i)} strokeWidth={2} strokeLinecap="round" />
+                        );
+                      })}
+                    </g>
+                  );
+                })()
+              : null}
+            {(config.groundDecor ?? []).map((g, i) => (
+              <polygon key={`gd${i}`} points={pts(g.poly)} fill={g.fill} stroke="rgba(4,36,20,0.15)" strokeWidth={1} />
+            ))}
             {/* energy routes */}
             {routeIds.map((id, i) => {
               const sp = routes[id].map(([x, y]) => iso([x, y, 0.02]));
