@@ -1,0 +1,70 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\ProductPackage;
+use App\Models\Setting;
+use Database\Seeders\NeiraSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
+use Tests\TestCase;
+
+class PublicSiteTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Storage::fake('public');
+        $this->withoutVite();
+        $this->seed(NeiraSeeder::class);
+    }
+
+    public function test_all_public_pages_render(): void
+    {
+        $pkg = ProductPackage::with('category')->first();
+        foreach (['/', '/tentang-kami', '/produk', '/produk/plts', '/produk/plts/brosur', '/produk/pju-tenaga-surya', $pkg->url(),
+            '/solusi/hunian', '/portfolio', '/blog', '/promo', '/faq', '/galeri', '/kontak', '/halaman/perizinan-plts', '/sitemap.xml'] as $url) {
+            $this->get($url)->assertOk();
+        }
+    }
+
+    public function test_package_page_shows_admin_managed_data(): void
+    {
+        $pkg = ProductPackage::with('category')->where('name', 'PLTS On Grid 5 kWp')->first();
+        $pkg->update(['base_price' => 61_234_000]);
+
+        $this->get($pkg->url())->assertOk()->assertSee('PLTS On Grid 5 kWp')->assertSee('Rp 61.234.000')->assertSee('Monocrystalline');
+    }
+
+    public function test_brochure_lists_packages_of_child_categories(): void
+    {
+        $this->get('/produk/plts/brosur')->assertOk()
+            ->assertSee('PLTS On Grid 3 kWp')->assertSee('PLTS Off Grid 1 kWp')->assertSee('PLTS Hybrid 10 kWp');
+    }
+
+    public function test_inactive_package_returns_404(): void
+    {
+        $pkg = ProductPackage::with('category')->first();
+        $url = $pkg->url();
+        $pkg->update(['is_active' => false]);
+
+        $this->get($url)->assertNotFound();
+    }
+
+    public function test_package_url_must_match_its_category(): void
+    {
+        $pkg = ProductPackage::where('name', 'PLTS On Grid 3 kWp')->first();
+        $this->get('/produk/plts-hybrid/'.$pkg->slug)->assertNotFound();
+    }
+
+    public function test_settings_changes_are_reflected_immediately(): void
+    {
+        $contact = Setting::get('contact');
+        $contact['phone'] = '021 999 888';
+        Setting::put('contact', $contact);
+
+        $this->get('/kontak')->assertSee('021 999 888');
+    }
+}

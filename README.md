@@ -1,59 +1,64 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Neira Energy — Website & Admin Panel
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Website company profile + sales tool PT Neira Bumi Energi. Dibangun dengan **Laravel 12**, **Filament 3** (admin panel), Blade + Tailwind CSS 4 + Alpine.js.
 
-## About Laravel
+## Fase 1 (selesai)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+| Modul | Admin (`/admin`) | Halaman publik |
+|---|---|---|
+| Identitas perusahaan (profil, kontak, sosmed, visi-misi, unit bisnis, angka, SEO & tracking) | Pengaturan → Identitas Perusahaan | header, footer, `/tentang-kami`, `/kontak` |
+| Banner halaman utama (jadwal tayang, gambar desktop/mobile, 2 tombol) | Konten → Banner | slider beranda |
+| Kategori produk + **brosur HTML** (section builder) | Produk → Kategori & Brosur | `/produk/{kategori}` & `/produk/{kategori}/brosur` (cetak/PDF) |
+| Paket produk per kapasitas (gambar, data teknis, BOM, lingkup kerja, harga, datasheet) | Produk → Paket Produk | `/produk/{kategori}/{paket}` |
+| Promo (% / nominal, maks potongan, semua/kategori/paket, periode) | Produk → Promo | `/promo`, harga coret otomatis |
+| Segmen pasar (5 segmen) | Produk → Segmen Pasar | `/solusi/{segmen}` |
+| Blog / artikel + kategori | Konten → Blog | `/blog` |
+| Portfolio (filter tipe & segmen, peta sebaran) | Konten → Portfolio | `/portfolio` |
+| FAQ (per kelompok, bisa disisipkan ke brosur) | Konten → FAQ | `/faq` |
+| Galeri (foto & video YouTube) | Konten → Galeri | `/galeri` |
+| Klien & partner, testimoni, legalitas & sertifikasi | Konten → ... | beranda, tentang kami |
+| Halaman statis berbasis blok (mis. Perizinan PLTS) | Konten → Halaman Statis | `/halaman/{slug}` |
+| Pengguna & role (Super Admin, Manajer, BD/Sales, Marketing) | Pengaturan → Pengguna | — |
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Sitemap otomatis di `/sitemap.xml`.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Role & hak akses
+Diatur di `App\Models\User::PERMISSIONS`:
+- **Super Admin** – semua modul.
+- **Manajer** – konten, produk, promo, pengaturan (+ CRM & penjualan di fase berikutnya).
+- **BD / Sales** – lihat produk & promo (tidak bisa ubah), CRM & penjualan.
+- **Marketing / Konten** – konten website, produk, promo.
 
-## Learning Laravel
+### Brosur HTML
+Setiap kategori punya tab **Brosur (HTML)** berisi section: Hero, Teks + Gambar, Keunggulan, Angka, **Tabel Paket (otomatis)**, **Sub-kategori (otomatis)**, Spesifikasi, Alur, Galeri, FAQ, CTA, HTML kustom. Versi cetak di `/produk/{slug}/brosur` → tombol *Cetak / Simpan PDF*.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### Harga & promo
+`ProductPackage::finalPrice()` memilih promo aktif dengan potongan terbesar. Logika ini akan dipakai ulang oleh kalkulator, quotation, dan proposal (fase 2–3).
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Instalasi
 
-## Laravel Sponsors
+```bash
+composer install
+npm install && npm run build
+cp .env.example .env && php artisan key:generate
+# atur DB_* di .env (MySQL untuk production)
+php artisan migrate --seed
+php artisan storage:link
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Seeder (`database/seeders/NeiraSeeder.php`) mengisi data dari Company Profile 2026 (identitas, legalitas, unit bisnis, 16 portfolio dengan foto, kategori, 24 contoh paket, FAQ, banner, halaman Perizinan PLTS).
 
-### Premium Partners
+Login admin awal: `ADMIN_EMAIL` / `ADMIN_PASSWORD` dari `.env` (default `admin@neiraenergy.com` / `password` — **segera ganti**).
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+> ⚠️ Harga paket di seeder adalah **contoh**. Sesuaikan di admin sebelum go-live.
 
-## Contributing
+## Test
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+php artisan test
+```
 
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Roadmap
+- **Fase 2** – Kalkulator PLTS/PJU → rekomendasi paket; CRM tiket multi-source (form web, kalkulator, WhatsApp, Email); dashboard pipeline.
+- **Fase 3** – Quotation generator (tarik data paket + promo, snapshot harga, approval diskon) & proposal generator (paket standar + generator custom: Helioscope, NGO, backup genset, dll — porting dari AppScript).
+- **Fase 4** – Partnership / affiliate (referral link, atribusi tiket, komisi).

@@ -2,48 +2,69 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
+    public const ROLES = [
+        'super_admin' => 'Super Admin',
+        'manager' => 'Manajer',
+        'sales' => 'BD / Sales',
+        'marketing' => 'Marketing / Konten',
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
+     * Modul yang boleh diakses tiap role. Super admin selalu boleh semua.
+     * Kunci = nama grup/modul yang dipakai di Resource::canAccess().
      */
-    protected $hidden = [
-        'password',
-        'remember_token',
+    public const PERMISSIONS = [
+        'manager' => ['content', 'products', 'promos', 'settings', 'crm', 'sales'],
+        'sales' => ['products.view', 'promos.view', 'crm', 'sales'],
+        'marketing' => ['content', 'products', 'promos'],
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+    protected $attributes = ['role' => 'marketing', 'is_active' => true];
+
+    protected $fillable = ['name', 'email', 'password', 'role', 'phone', 'is_active'];
+
+    protected $hidden = ['password', 'remember_token'];
+
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return (bool) $this->is_active;
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
+    }
+
+    /** Cek izin modul. 'products' juga memberi 'products.view'. */
+    public function canModule(string $module): bool
+    {
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+        $perms = self::PERMISSIONS[$this->role] ?? [];
+        $base = explode('.', $module)[0];
+
+        return in_array($module, $perms, true) || in_array($base, $perms, true);
     }
 }
