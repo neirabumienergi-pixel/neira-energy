@@ -41,9 +41,9 @@ class NeiraSeeder extends Seeder
 
     public function run(): void
     {
-        User::updateOrCreate(['email' => env('ADMIN_EMAIL', 'admin@neiraenergy.com')], [
+        User::updateOrCreate(['email' => env('ADMIN_EMAIL') ?: 'admin@neiraenergy.com'], [
             'name' => 'Super Admin',
-            'password' => env('ADMIN_PASSWORD', 'password'),
+            'password' => env('ADMIN_PASSWORD') ?: 'password',
             'role' => 'super_admin',
             'is_active' => true,
         ]);

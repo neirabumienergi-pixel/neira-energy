@@ -50,6 +50,12 @@ Seeder (`database/seeders/NeiraSeeder.php`) mengisi data dari Company Profile 20
 
 Login admin awal: `ADMIN_EMAIL` / `ADMIN_PASSWORD` dari `.env` (default `admin@neiraenergy.com` / `password` — **segera ganti**).
 
+Buat atau reset akun Super Admin kapan saja:
+
+```bash
+php artisan neira:admin admin@neiraenergy.com PasswordBaru123
+```
+
 > ⚠️ Harga paket di seeder adalah **contoh**. Sesuaikan di admin sebelum go-live.
 
 ## Test
