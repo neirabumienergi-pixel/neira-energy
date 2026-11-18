@@ -2,6 +2,8 @@ import React from "react";
 import {
   AbsoluteFill,
   Easing,
+  Img,
+  staticFile,
   interpolate,
   interpolateColors,
   spring,
@@ -742,23 +744,20 @@ export const CommercialIndustrial: React.FC = () => {
       </AbsoluteFill>
 
       {/* Title */}
-      <div style={{ position: "absolute", left: 72, top: 64 }}>
-        <div
+      <div style={{ position: "absolute", left: 72, top: 52 }}>
+        <Img
+          src={staticFile("logo.png")}
           style={{
-            fontSize: 24,
-            fontWeight: 600,
-            letterSpacing: 4,
-            color: BRAND.orange500,
+            width: 230,
+            display: "block",
             opacity: eyebrowIn,
             transform: `translateY(${(1 - eyebrowIn) * 20}px)`,
           }}
-        >
-          SEGMEN PASAR
-        </div>
+        />
         <div
           style={{
-            marginTop: 6,
-            fontSize: 68,
+            marginTop: 14,
+            fontSize: 62,
             lineHeight: 1.05,
             fontWeight: 700,
             color: BRAND.green950,
