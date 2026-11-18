@@ -101,6 +101,8 @@ export type SegmentConfig = {
   water?: { x: number; y: number; w: number; d: number };
   roads?: { x: number; y: number; w: number; d: number }[];
   groundDecor?: { poly: P3[]; fill: string }[];
+  /** screen-space overlay drawn above everything (e.g. an app card) */
+  overlay?: (ctx: { frame: number; fps: number; fontFamily: string }) => React.ReactNode;
 };
 
 export const shineFill = (sx: number, glintX: number) =>
@@ -905,6 +907,8 @@ export const SegmentScene: React.FC<{ config: SegmentConfig }> = ({ config }) =>
           <span style={{ color: BRAND.green500 }}>{config.title[1]}</span>
         </div>
       </div>
+
+      {config.overlay?.({ frame, fps, fontFamily })}
 
       {/* Bottom captions */}
       <div
