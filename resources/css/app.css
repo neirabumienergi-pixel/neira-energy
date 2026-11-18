@@ -91,3 +91,14 @@
     @page { size: A4; margin: 0; }
     body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
+
+/* ---------- Motion graphic hero ---------- */
+.hero-motion .hm-glow { transform-origin: 1080px 110px; animation: hm-pulse 7s ease-in-out infinite; }
+.hero-motion .hm-rays { transform-origin: 1080px 110px; animation: hm-spin 120s linear infinite; }
+.hero-motion .hm-flow { stroke-dasharray: 160 1100; animation: hm-flow var(--hm-dur, 8s) linear infinite; animation-delay: var(--hm-delay, 0s); }
+.hero-motion .hm-spark { opacity: 0; animation: hm-float var(--hm-dur, 8s) ease-in infinite; animation-delay: var(--hm-delay, 0s); }
+@keyframes hm-pulse { 0%, 100% { transform: scale(1); opacity: .9; } 50% { transform: scale(1.15); opacity: 1; } }
+@keyframes hm-spin { to { transform: rotate(360deg); } }
+@keyframes hm-flow { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -1260; } }
+@keyframes hm-float { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: .85; } 100% { transform: translateY(-320px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .hero-motion * { animation: none !important; } .hero-motion .hm-spark { opacity: .4; } }

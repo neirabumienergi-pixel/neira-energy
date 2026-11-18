@@ -40,6 +40,13 @@ class BannerResource extends Resource
                 Fields::image('image', 'Gambar desktop (rasio 16:9, min 1600px)', 'banners')->required(),
                 Fields::image('image_mobile', 'Gambar mobile (opsional, potret)', 'banners'),
             ])->columns(2),
+            Forms\Components\Section::make('Video latar (opsional)')
+                ->description('Jika diisi, video diputar otomatis (tanpa suara, berulang) menggantikan gambar desktop.')
+                ->schema([
+                    Fields::video('video', 'Upload video', 'banners'),
+                    Forms\Components\TextInput::make('video_url')->label('…atau link file video (.mp4/.webm)')->url()
+                        ->placeholder('https://cdn.example.com/hero.mp4')->helperText('Link langsung ke file video (bukan YouTube).'),
+                ])->columns(2)->collapsible(),
             Forms\Components\Section::make('Tombol')->schema([
                 Forms\Components\TextInput::make('cta_label')->label('Tombol utama – teks'),
                 Forms\Components\TextInput::make('cta_url')->label('Tombol utama – link')->placeholder('/kalkulator atau https://...'),
@@ -62,6 +69,7 @@ class BannerResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make('image')->disk('public')->label('')->width(120)->height(60),
                 Tables\Columns\TextColumn::make('title')->label('Judul')->searchable()->description(fn ($record) => $record->subtitle),
+                Tables\Columns\IconColumn::make('has_video')->label('Video')->boolean()->state(fn ($record) => filled($record->video) || filled($record->video_url)),
                 Tables\Columns\TextColumn::make('starts_at')->label('Mulai')->dateTime('d M Y')->placeholder('—'),
                 Tables\Columns\TextColumn::make('ends_at')->label('Selesai')->dateTime('d M Y')->placeholder('—'),
                 Tables\Columns\ToggleColumn::make('is_active')->label('Aktif'),

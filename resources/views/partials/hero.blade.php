@@ -1,12 +1,22 @@
 {{-- Hero interaktif: banner / segmen (kiri) + kalkulator & simulasi (kanan). Logika: resources/js/hero.js --}}
 <section x-data="solarHero(@js($hero))" class="relative overflow-hidden bg-brand-950 pb-24">
-    {{-- Latar --}}
-    <template x-for="img in [bgImage]" :key="img">
-        <img :src="img" x-show="img" alt="" class="absolute inset-0 h-full w-full object-cover"
-             x-transition:enter="transition duration-700" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+    {{-- Latar: gambar / video --}}
+    <template x-for="b in [bg]" :key="b.key">
+        <div class="absolute inset-0" x-transition:enter="transition duration-700" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+            <img :src="b.image" x-show="b.image" alt="" class="absolute inset-0 h-full w-full object-cover">
+            <template x-if="b.video">
+                <video :src="b.video" :poster="b.image" autoplay muted loop playsinline preload="auto" aria-hidden="true"
+                       x-init="$el.muted = true; $el.play().catch(() => {})" class="absolute inset-0 h-full w-full object-cover"></video>
+            </template>
+        </div>
     </template>
-    <div class="absolute inset-0 bg-gradient-to-r from-brand-950 via-brand-950/85 to-brand-950/40"></div>
-    <div class="absolute -right-32 top-10 h-96 w-96 rounded-full bg-accent-500/20 blur-3xl"></div>
+    @php($overlay = ['light' => 'from-brand-950/85 via-brand-950/55 to-brand-950/10', 'medium' => 'from-brand-950 via-brand-950/85 to-brand-950/40', 'dark' => 'from-brand-950 via-brand-950/95 to-brand-950/75'][setting('hero.overlay', 'medium')] ?? 'from-brand-950 via-brand-950/85 to-brand-950/40')
+    <div class="absolute inset-0 bg-gradient-to-r {{ $overlay }}"></div>
+    @if($hero['display']['motion'])
+        @include('partials.hero-motion')
+    @else
+        <div class="absolute -right-32 top-10 h-96 w-96 rounded-full bg-accent-500/20 blur-3xl"></div>
+    @endif
 
     <div class="container-x relative grid items-center gap-10 pt-10 lg:min-h-[78vh] lg:grid-cols-12 lg:pt-14">
         {{-- Kiri --}}

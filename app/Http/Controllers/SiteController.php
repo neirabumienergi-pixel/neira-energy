@@ -29,7 +29,14 @@ class SiteController extends Controller
         return view('site.home', [
             'banners' => $banners,
             'hero' => [
-                'banners' => $banners->map(fn ($b) => ['image' => media($b->image)])->values(),
+                'banners' => $banners->map(fn ($b) => [
+                    'image' => media($b->image), 'image_mobile' => media($b->image_mobile),
+                    'video' => $b->video ? media($b->video) : ($b->video_url ?: null),
+                ])->values(),
+                'display' => [
+                    'motion' => (bool) (setting('hero.motion') ?? true),
+                    'video_on_mobile' => (bool) setting('hero.video_on_mobile', false),
+                ],
                 'segments' => $heroSegments->map(fn (Segment $s) => [
                     'slug' => $s->slug, 'name' => $s->name, 'tagline' => $s->tagline,
                     'icon' => $this->svg($s->icon, 'heroicon-o-bolt'),
@@ -37,6 +44,7 @@ class SiteController extends Controller
                     'text' => $s->hero_text ?: $s->short_description,
                     'points' => array_values(array_filter($s->hero_points ?? [])),
                     'image' => media($s->hero_image ?: $s->image),
+                    'video' => $s->hero_video ? media($s->hero_video) : null,
                     'cta_label' => $s->hero_cta_label ?: 'Konsultasi gratis',
                     'cta_url' => $s->hero_cta_url,
                     'profile' => $s->calc_profile ?: 'business',

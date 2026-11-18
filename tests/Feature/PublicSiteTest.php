@@ -42,6 +42,20 @@ class PublicSiteTest extends TestCase
             ->assertDontSee('Partner andal untuk developer');
     }
 
+    public function test_hero_video_and_motion_settings(): void
+    {
+        \App\Models\Banner::query()->first()->update(['video_url' => 'https://cdn.example.com/hero.mp4']);
+        Setting::put('hero', ['motion' => true, 'video_on_mobile' => false, 'overlay' => 'dark']);
+
+        $this->get('/')->assertOk()
+            ->assertSee('cdn.example.com', false)->assertSee('hero.mp4', false)
+            ->assertSee('hero-motion', false)
+            ->assertSee('to-brand-950/75', false);
+
+        Setting::put('hero', ['motion' => false]);
+        $this->get('/')->assertDontSee('hero-motion', false);
+    }
+
     public function test_package_page_shows_admin_managed_data(): void
     {
         $pkg = ProductPackage::with('category')->where('name', 'PLTS On Grid 5 kWp')->first();

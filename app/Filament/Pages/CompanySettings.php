@@ -32,7 +32,7 @@ class CompanySettings extends Page implements HasForms
 
     protected static string $view = 'filament.pages.settings';
 
-    public const KEYS = ['company', 'contact', 'social', 'about', 'units', 'stats', 'calculator', 'seo', 'tracking'];
+    public const KEYS = ['company', 'contact', 'social', 'about', 'units', 'stats', 'hero', 'calculator', 'seo', 'tracking'];
 
     public ?array $data = [];
 
@@ -116,6 +116,14 @@ class CompanySettings extends Page implements HasForms
                         $text('label', 'Keterangan')->required(),
                     ])->columns(3)->grid(2),
                 ]),
+                Forms\Components\Tabs\Tab::make('Tampilan Hero')->icon('heroicon-o-film')->schema([
+                    Forms\Components\Toggle::make('hero.motion')->label('Motion graphic (sinar matahari, aliran energi, partikel)')->default(true)
+                        ->helperText('Animasi ringan di atas gambar/video latar. Otomatis nonaktif bila pengunjung memilih "kurangi animasi".'),
+                    Forms\Components\Toggle::make('hero.video_on_mobile')->label('Putar video di HP')->default(false)
+                        ->helperText('Mati = HP menampilkan gambar poster saja (hemat kuota pengunjung).'),
+                    Forms\Components\Select::make('hero.overlay')->label('Kegelapan lapisan warna')->options(['light' => 'Ringan', 'medium' => 'Sedang', 'dark' => 'Gelap'])->default('medium')
+                        ->helperText('Lapisan hijau di atas latar agar teks tetap terbaca.'),
+                ])->columns(1),
                 Forms\Components\Tabs\Tab::make('Kalkulator')->icon('heroicon-o-calculator')->schema([
                     Forms\Components\Placeholder::make('calc_help')->hiddenLabel()->columnSpanFull()
                         ->content('Asumsi untuk kalkulator hemat & simulasi surya di beranda. Rekomendasi diambil dari paket di kategori terpilih: paket dengan rentang tagihan yang cocok, atau paket dengan kapasitas terdekat. Kebutuhan > 1,5x paket terbesar dianggap proyek custom (pakai harga per kWp).'),

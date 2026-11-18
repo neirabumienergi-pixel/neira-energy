@@ -131,6 +131,7 @@ class NeiraSeeder extends Seeder
             'og_image' => $this->asset('hero'),
             'keywords' => 'PLTS, EPC PLTS, panel surya, PJU tenaga surya, solar panel Indonesia',
         ]);
+        Setting::put('hero', ['motion' => true, 'video_on_mobile' => false, 'overlay' => 'medium']);
         Setting::put('calculator', \App\Services\SolarCalculator::DEFAULTS);
         Setting::put('tracking', ['ga4' => null, 'gtm' => null, 'meta_pixel' => null]);
     }

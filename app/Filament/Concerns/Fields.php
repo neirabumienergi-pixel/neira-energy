@@ -38,6 +38,13 @@ class Fields
             ->disk('public')->directory($dir)->maxSize(4096);
     }
 
+    public static function video(string $name = 'video', string $label = 'Video latar (MP4/WebM)', string $dir = 'videos'): FileUpload
+    {
+        return FileUpload::make($name)->label($label)->disk('public')->directory($dir)
+            ->acceptedFileTypes(['video/mp4', 'video/webm'])->maxSize(51200)
+            ->helperText('Disarankan: MP4 H.264, 1920×1080, 10–20 detik, tanpa suara, < 10 MB. Gambar tetap dipakai sebagai poster & untuk mobile.');
+    }
+
     public static function seo(): Section
     {
         return Section::make('SEO')->description('Opsional. Jika kosong, judul & ringkasan dipakai.')

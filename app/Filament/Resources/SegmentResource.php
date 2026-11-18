@@ -57,6 +57,7 @@ class SegmentResource extends Resource
                     Forms\Components\Textarea::make('hero_text')->label('Teks hero')->rows(2)->placeholder('Kosong = ringkasan segmen')->columnSpanFull(),
                     Forms\Components\TagsInput::make('hero_points')->label('Poin keunggulan (maks. 4 disarankan)')->columnSpanFull(),
                     Fields::image('hero_image', 'Gambar latar hero', 'segments'),
+                    Fields::video('hero_video', 'Video latar hero (opsional)', 'segments'),
                     Forms\Components\Grid::make(1)->schema([
                         Forms\Components\TextInput::make('hero_cta_label')->label('Tombol – teks')->placeholder('Konsultasi gratis'),
                         Forms\Components\TextInput::make('hero_cta_url')->label('Tombol – link')->placeholder('Kosong = WhatsApp dengan hasil kalkulator'),

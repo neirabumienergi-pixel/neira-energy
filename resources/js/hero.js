@@ -10,7 +10,7 @@ const LOAD_PROFILES = {
     business: [2, 2, 2, 2, 2, 2, 3, 5, 8, 9, 9, 9, 8, 9, 9, 9, 8, 6, 4, 3, 3, 2, 2, 2],
 };
 
-export default function solarHero({ segments = [], banners = [], calc = {}, waNumber = '' }) {
+export default function solarHero({ segments = [], banners = [], calc = {}, waNumber = '', display = {} }) {
     const cfg = calc.config || {};
     const packages = calc.packages || [];
     const minLog = Math.log(cfg.min_bill || 500000);
@@ -25,7 +25,13 @@ export default function solarHero({ segments = [], banners = [], calc = {}, waNu
         billPos: 0,              // posisi slider 0..1000 (skala log)
         hour: 12, playing: null,
 
+        useVideo: true,
+        isMobile: false,
+
         init() {
+            const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            this.isMobile = window.matchMedia('(max-width: 640px)').matches;
+            this.useVideo = !reduced && (!this.isMobile || !!display.video_on_mobile);
             this.setBill(3000000);
             this.startSlides();
         },
@@ -44,9 +50,12 @@ export default function solarHero({ segments = [], banners = [], calc = {}, waNu
             }
         },
         get current() { return this.seg === null ? null : this.segments[this.seg]; },
-        get bgImage() {
-            if (this.current?.image) return this.current.image;
-            return this.banners[this.slide]?.image || null;
+        /** Latar aktif: gambar (poster) + video opsional */
+        get bg() {
+            const src = this.current || this.banners[this.slide] || {};
+            const image = (this.isMobile && src.image_mobile) || src.image || null;
+            const video = this.useVideo ? (src.video || null) : null;
+            return { key: (video || image || 'none') + (this.current ? ':s' : ':b'), image, video };
         },
 
         // ---------- Kalkulator ----------
