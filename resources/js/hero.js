@@ -15,6 +15,8 @@ export default function solarHero({ segments = [], banners = [], calc = {}, waNu
     const packages = calc.packages || [];
     const minLog = Math.log(cfg.min_bill || 500000);
     const maxLog = Math.log(cfg.max_bill || 100000000);
+    // Mode proyek (pemerintah, komunitas, mitra EPC): input kapasitas, bukan tagihan
+    const minKwpLog = Math.log(10), maxKwpLog = Math.log(5000);
 
     return {
         segments, banners, packages, cfg,
@@ -23,6 +25,8 @@ export default function solarHero({ segments = [], banners = [], calc = {}, waNu
         tab: 'calc',
         profile: 'residential',
         billPos: 0,              // posisi slider 0..1000 (skala log)
+        kwpPos: 0,               // posisi slider kapasitas proyek 0..1000 (skala log)
+        billTouched: false,      // pengunjung sudah menggeser slider → jangan ditimpa
         hour: 12, playing: null,
 
         useVideo: true,
@@ -33,8 +37,11 @@ export default function solarHero({ segments = [], banners = [], calc = {}, waNu
             this.isMobile = window.matchMedia('(max-width: 640px)').matches;
             this.useVideo = !reduced && (!this.isMobile || !!display.video_on_mobile);
             this.setBill(3000000);
+            this.setKwp(100);
             this.startSlides();
         },
+        /** Interaksi pertama menghentikan rotasi banner agar konten tidak berganti di bawah jari pengunjung. */
+        interact() { clearInterval(this.timer); this.timer = null; },
 
         // ---------- Banner & segmen ----------
         startSlides() {
@@ -42,13 +49,18 @@ export default function solarHero({ segments = [], banners = [], calc = {}, waNu
             if (this.banners.length > 1) this.timer = setInterval(() => { if (this.seg === null) this.slide = (this.slide + 1) % this.banners.length }, 6500);
         },
         pick(i) {
+            this.interact();
             this.seg = this.seg === i ? null : i;
+            if (this.seg === null && this.profile === 'project') this.profile = 'residential';
             if (this.seg !== null) {
                 const s = this.segments[i];
                 this.profile = s.profile;
-                this.setBill(s.profile === 'residential' ? 3000000 : 50000000);
+                if (!this.billTouched && s.profile !== 'project') this.setBill(s.profile === 'residential' ? 3000000 : 30000000);
             }
         },
+        setProfile(p) { this.interact(); this.profile = p; },
+        get isProject() { return this.profile === 'project'; },
+        get profileLabel() { return { residential: 'Rumah', business: 'Bisnis / Instansi', project: 'Proyek' }[this.profile]; },
         get current() { return this.seg === null ? null : this.segments[this.seg]; },
         /** Latar aktif: gambar (poster) + video opsional */
         get bg() {
@@ -65,9 +77,23 @@ export default function solarHero({ segments = [], banners = [], calc = {}, waNu
             return Math.round(v / step) * step;
         },
         setBill(v) { this.billPos = Math.round((Math.log(v) - minLog) / (maxLog - minLog) * 1000); },
+        get projectKwp() {
+            const v = Math.exp(minKwpLog + (maxKwpLog - minKwpLog) * this.kwpPos / 1000);
+            const step = v < 100 ? 5 : v < 1000 ? 25 : 100;
+            return Math.round(v / step) * step;
+        },
+        setKwp(v) { this.kwpPos = Math.round((Math.log(v) - minKwpLog) / (maxKwpLog - minKwpLog) * 1000); },
         get tariff() { return this.profile === 'residential' ? cfg.tariff_residential : cfg.tariff_business; },
         get yieldPerKwp() { return cfg.psh * cfg.performance_ratio * 30; },
         get result() {
+            if (this.isProject) {
+                const kwp = this.projectKwp;
+                const production = kwp * this.yieldPerKwp;
+                return {
+                    kwhMonth: production / cfg.offset_business, kwp, production, saving: production * cfg.tariff_business,
+                    cost: kwp * cfg.price_per_kwp, pkg: null, payback: null, co2: production * 12 * cfg.emission_factor / 1000,
+                };
+            }
             const bill = this.bill;
             const kwhMonth = bill / this.tariff;
             const offset = this.profile === 'residential' ? cfg.offset_residential : cfg.offset_business;
@@ -90,10 +116,18 @@ export default function solarHero({ segments = [], banners = [], calc = {}, waNu
             if (!this.packages.length || kwp > Math.max(...this.packages.map(p => p.capacity)) * 1.5) return null;
             return [...this.packages].sort((a, b) => Math.abs(a.capacity - kwp) - Math.abs(b.capacity - kwp) || b.capacity - a.capacity)[0];
         },
+        get paybackRange() {
+            const p = this.result.payback;
+            if (!p) return null;
+            const lo = Math.max(1, Math.floor(p * 0.9)), hi = Math.ceil(p * 1.1);
+            return lo === hi ? `${lo}` : `${lo}–${hi}`;
+        },
         waLink(extra = '') {
             const r = this.result;
             const who = this.current ? ` (${this.current.name})` : '';
-            const msg = `Halo Neira Energy${who}, tagihan listrik saya sekitar Rp ${nf.format(this.bill)}/bulan.`
+            const msg = this.isProject
+                ? `Halo Neira Energy${who}, kami merencanakan proyek PLTS sekitar ${this.fmt(r.kwp)} kWp. Mohon diskusi kebutuhan & penawarannya.` + extra
+                : `Halo Neira Energy${who}, tagihan listrik saya sekitar Rp ${nf.format(this.bill)}/bulan.`
                 + (r.pkg ? ` Saya tertarik dengan ${r.pkg.name}.` : ` Estimasi kebutuhan ±${this.fmt(r.kwp, 1)} kWp.`) + ' Mohon penawarannya.' + extra;
             return `https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`;
         },
@@ -104,7 +138,7 @@ export default function solarHero({ segments = [], banners = [], calc = {}, waNu
             return this.result.kwp * cfg.performance_ratio * cfg.psh * (Math.PI / 24) * Math.sin(Math.PI * (h - 6) / 12);
         },
         loadAt(h) {
-            const w = LOAD_PROFILES[this.profile];
+            const w = LOAD_PROFILES[this.profile === 'residential' ? 'residential' : 'business'];
             const sum = w.reduce((a, b) => a + b, 0);
             const daily = this.result.kwhMonth / 30;
             const i = Math.floor(h) % 24, j = (i + 1) % 24, f = h - Math.floor(h);
@@ -120,9 +154,14 @@ export default function solarHero({ segments = [], banners = [], calc = {}, waNu
             return load ? Math.round(solar / load * 100) : 0;
         },
         get isNight() { return this.hour < 5.5 || this.hour > 18.5; },
-        get sunPos() {
+        get simStatus() {
+            const n = this.now;
+            if (n.prod <= 0.01) return 'night';
+            return n.grid < 0.01 ? 'solar' : 'mixed';
+        },
+        get sunStyle() {
             const t = Math.min(1, Math.max(0, (this.hour - 6) / 12));
-            return { x: 20 + t * 260, y: 110 - Math.sin(Math.PI * t) * 90 };
+            return { left: `${(20 + t * 260) / 3}%`, top: `${(110 - Math.sin(Math.PI * t) * 90) / 1.3}%` };
         },
         get skyClass() {
             const h = this.hour;
@@ -138,6 +177,7 @@ export default function solarHero({ segments = [], banners = [], calc = {}, waNu
             return pts.join(' ');
         },
         togglePlay() {
+            this.interact();
             if (this.playing) { clearInterval(this.playing); this.playing = null; return; }
             if (this.hour >= 23.5) this.hour = 0;
             this.playing = setInterval(() => {

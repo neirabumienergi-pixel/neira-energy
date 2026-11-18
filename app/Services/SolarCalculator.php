@@ -118,7 +118,7 @@ class SolarCalculator
             'packages' => $this->packages()->map(fn (ProductPackage $p) => [
                 'name' => $p->name, 'capacity' => (float) $p->capacity, 'label' => $p->capacity_label,
                 'min' => $p->min_monthly_bill, 'max' => $p->max_monthly_bill,
-                'price' => $p->finalPrice(), 'url' => $p->url(), 'image' => media($p->image),
+                'price' => $p->finalPrice(), 'url' => $p->url(), 'image' => media($p->image), 'warranty' => $p->warranty,
             ])->values()->all(),
         ];
     }

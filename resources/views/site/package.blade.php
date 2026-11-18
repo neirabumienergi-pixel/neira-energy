@@ -35,7 +35,7 @@
             <div>
                 <div class="flex flex-wrap items-center gap-2">
                     <span class="chip">{{ $category->full_name }}</span>
-                    @if($package->sku)<span class="text-xs text-slate-400">{{ $package->sku }}</span>@endif
+                    @if($package->sku)<span class="text-xs text-slate-500">{{ $package->sku }}</span>@endif
                 </div>
                 <h1 class="mt-3 text-3xl font-bold sm:text-4xl">{{ $package->name }}</h1>
                 <p class="mt-2 text-xl font-semibold text-brand-600">{{ $package->capacity_label }}{{ $package->phase ? ' · '.$package->phase : '' }}</p>
@@ -48,7 +48,7 @@
                         'Baterai' => $package->battery_kwh ? rtrim(rtrim(number_format($package->battery_kwh, 2, ',', '.'), '0'), ',').' kWh' : null,
                         'Area' => $package->area_required_m2 ? '± '.number_format($package->area_required_m2, 0, ',', '.').' m²' : null,
                     ]) as $k => $v)
-                        <div class="rounded-xl border border-slate-200 p-3"><p class="text-xs text-slate-400">{{ $k }}</p><p class="mt-0.5 text-sm font-semibold text-slate-900">{{ $v }}</p></div>
+                        <div class="rounded-xl border border-slate-200 p-3"><p class="text-xs text-slate-500">{{ $k }}</p><p class="mt-0.5 text-sm font-semibold text-slate-900">{{ $v }}</p></div>
                     @endforeach
                 </div>
 
@@ -56,12 +56,12 @@
                     @if($package->base_price)
                         @if($promo)
                             <div class="flex items-center gap-2">
-                                <span class="rounded-full bg-accent-500 px-2.5 py-0.5 text-xs font-bold text-white">{{ $promo->label }}</span>
+                                <span class="rounded-full bg-accent-500 px-2.5 py-0.5 text-xs font-bold text-brand-950">{{ $promo->label }}</span>
                                 <a href="{{ route('promos.show', $promo) }}" class="text-xs font-medium text-accent-700 hover:underline">{{ $promo->title }}</a>
                             </div>
-                            <p class="mt-2 text-sm text-slate-400 line-through">{{ rupiah($package->base_price) }}</p>
+                            <p class="mt-2 text-sm text-slate-500 line-through">{{ rupiah($package->base_price) }}</p>
                         @elseif($package->strike_price)
-                            <p class="text-sm text-slate-400 line-through">{{ rupiah($package->strike_price) }}</p>
+                            <p class="text-sm text-slate-500 line-through">{{ rupiah($package->strike_price) }}</p>
                         @endif
                         <p class="text-3xl font-extrabold text-slate-900">{{ rupiah($finalPrice) }}</p>
                         @if($package->price_note)<p class="mt-1 text-xs text-slate-500">{{ $package->price_note }}</p>@endif

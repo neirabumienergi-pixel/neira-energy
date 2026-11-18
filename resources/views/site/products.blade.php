@@ -12,9 +12,9 @@
                     <div class="lg:col-span-3">
                         <div class="flex items-center gap-3">
                             <div class="grid h-11 w-11 place-items-center rounded-xl bg-brand-50 text-brand-600"><x-icon :name="$cat->icon" class="h-6 w-6"/></div>
-                            @if($cat->tagline)<p class="eyebrow">{{ $cat->tagline }}</p>@endif
                         </div>
                         <h2 class="mt-3 text-2xl font-bold sm:text-3xl">{{ $cat->name }}</h2>
+                        @if($cat->tagline)<p class="mt-1 text-sm font-medium text-brand-700">{{ $cat->tagline }}</p>@endif
                         <p class="mt-3 text-slate-600">{{ $cat->short_description }}</p>
                         @if($cat->children->isNotEmpty())
                             <div class="mt-5 grid gap-3 sm:grid-cols-2">

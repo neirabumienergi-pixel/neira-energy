@@ -38,8 +38,8 @@
             <section class="relative overflow-hidden bg-brand-950 text-white">
                 @if($category->image)<img src="{{ media($category->image) }}" class="absolute inset-0 h-full w-full object-cover opacity-35" alt="">@endif
                 <div class="relative px-[12mm] py-14">
-                    @if($category->tagline)<p class="eyebrow">{{ $category->tagline }}</p>@endif
-                    <h1 class="mt-2 text-4xl font-bold text-white">{{ $category->name }}</h1>
+                    <h1 class="text-4xl font-bold text-white">{{ $category->name }}</h1>
+                    @if($category->tagline)<p class="mt-2 font-medium text-sun-300">{{ $category->tagline }}</p>@endif
                     <p class="mt-3 max-w-xl text-white/85">{{ $category->short_description }}</p>
                 </div>
             </section>
@@ -68,7 +68,7 @@
                     @endforeach
                 </div>
             </div>
-            <p class="mt-6 text-[11px] text-brand-100/60">Harga & spesifikasi dapat berubah sewaktu-waktu. Dokumen diperbarui {{ now()->translatedFormat('d F Y') }}.</p>
+            <p class="mt-6 text-xs text-brand-100/60">Harga & spesifikasi dapat berubah sewaktu-waktu. Dokumen diperbarui {{ now()->translatedFormat('d F Y') }}.</p>
         </footer>
     </div>
 </body>

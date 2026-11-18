@@ -52,7 +52,7 @@ class SegmentResource extends Resource
                 ->description('Muncul saat pengunjung memilih segmen ini di "Saya adalah…" pada beranda.')
                 ->schema([
                     Forms\Components\Toggle::make('show_in_hero')->label('Tampilkan di hero')->default(true),
-                    Forms\Components\Select::make('calc_profile')->label('Profil kalkulator')->options(['residential' => 'Rumah (tarif & pola pemakaian rumah tangga)', 'business' => 'Bisnis / Instansi'])->default('business'),
+                    Forms\Components\Select::make('calc_profile')->label('Profil kalkulator')->options(['residential' => 'Rumah (input tagihan, tarif & pola rumah tangga)', 'business' => 'Bisnis / Instansi (input tagihan)', 'project' => 'Proyek (input kapasitas kWp → estimasi investasi)'])->default('business'),
                     Forms\Components\TextInput::make('hero_title')->label('Judul hero')->placeholder('Kosong = "Solusi energi surya untuk {nama}"')->columnSpanFull(),
                     Forms\Components\Textarea::make('hero_text')->label('Teks hero')->rows(2)->placeholder('Kosong = ringkasan segmen')->columnSpanFull(),
                     Forms\Components\TagsInput::make('hero_points')->label('Poin keunggulan (maks. 4 disarankan)')->columnSpanFull(),

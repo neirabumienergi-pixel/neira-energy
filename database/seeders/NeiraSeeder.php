@@ -94,10 +94,15 @@ class NeiraSeeder extends Seeder
                 'Membangun kemitraan strategis jangka panjang',
             ],
             'why' => [
-                ['icon' => 'heroicon-o-arrow-path-rounded-square', 'title' => 'End-to-End Energy Ecosystem', 'text' => 'Pengelolaan proyek dari perencanaan hingga operasional dalam satu ekosistem terintegrasi.'],
-                ['icon' => 'heroicon-o-user-group', 'title' => 'Tim Profesional Berpengalaman', 'text' => 'Didukung tenaga ahli dengan pengalaman proyek energi nasional.'],
-                ['icon' => 'heroicon-o-shield-check', 'title' => 'Standar HSE Tinggi', 'text' => 'Keselamatan sebagai prioritas utama dalam setiap proyek.'],
-                ['icon' => 'heroicon-o-globe-asia-australia', 'title' => 'Fokus Sustainability & ESG', 'text' => 'Komitmen terhadap transisi energi dan pembangunan berkelanjutan.'],
+                ['icon' => 'heroicon-o-wrench-screwdriver', 'title' => 'Workshop fabrikasi sendiri',
+                    'text' => 'Mounting, access ladder, walkway, shelter inverter, hingga tiang PJU kami produksi di workshop Gunung Putri, Bogor. Spesifikasi mengikuti proyek Anda, jadwal tidak bergantung pada vendor.',
+                    'image' => $this->asset('install-1'), 'url' => '/produk/fabrikasi-custom', 'link_label' => 'Lihat produk fabrikasi'],
+                ['icon' => 'heroicon-o-document-check', 'title' => 'Tim khusus perizinan PLTS',
+                    'text' => 'Kuota PLTS atap hanya dibuka Januari dan Juli (Permen ESDM No. 2/2024). Kami siapkan dokumen, NIDI, hingga SLO. Neira ditunjuk resmi oleh LIT untuk layanan SLO PLTS.',
+                    'image' => $this->asset('install-2'), 'url' => '/halaman/perizinan-plts', 'link_label' => 'Pelajari perizinan'],
+                ['icon' => 'heroicon-o-map', 'title' => 'Dari pabrik 4 MWp sampai 19 kapal nelayan',
+                    'text' => 'Lebih dari 10 MWp terpasang di 30+ kota: atap pabrik di Medan dan Cibitung, hingga elektrifikasi perahu nelayan di Labuan Bajo.',
+                    'image' => $this->asset('kapal-2'), 'url' => '/portfolio', 'link_label' => 'Lihat portfolio'],
             ],
             'esg' => [
                 ['title' => 'Environmental', 'text' => 'Mendukung pengurangan karbon melalui pemanfaatan energi bersih.'],
@@ -123,7 +128,7 @@ class NeiraSeeder extends Seeder
             ['value' => '10+', 'unit' => 'MWp', 'label' => 'Kapasitas terpasang dalam 2 tahun'],
             ['value' => '30+', 'unit' => 'Kota', 'label' => 'Lokasi proyek di Indonesia'],
             ['value' => '50+', 'unit' => '', 'label' => 'Tim profesional'],
-            ['value' => '~10.000', 'unit' => 't', 'label' => 'Emisi CO₂ dihindari*'],
+            ['value' => '~10.000', 'unit' => 'ton', 'label' => 'Emisi CO₂ dihindari*'],
         ]);
         Setting::put('seo', [
             'meta_title' => 'Neira Energy — EPC PLTS, PJU Tenaga Surya & Solusi Energi Terbarukan',
@@ -141,9 +146,9 @@ class NeiraSeeder extends Seeder
         $hero = [
             'Hunian' => ['Tagihan listrik rumah turun, nilai rumah naik', 'Paket PLTS rumah siap pasang lengkap dengan pengurusan izin PLN — tanpa repot.', ['Paket mulai 3 kWp', 'Termasuk NIDI & SLO', 'Monitoring via aplikasi', 'Garansi hingga 25 tahun'], 'residential', 'karawang-164'],
             'Bisnis & Industri' => ['Pangkas biaya listrik operasional & capai target ESG', 'PLTS atap dan ground-mounted untuk pabrik, gudang, gedung, dan kantor — dirancang untuk payback tercepat.', ['Desain & simulasi produksi', 'Skema EPC atau kemitraan', 'Laporan reduksi CO₂', 'O&M berkala'], 'business', 'cikarang-504'],
-            'Proyek Pemerintah' => ['Mitra terpercaya untuk proyek energi pemerintah', 'Legalitas lengkap — SBU PLTS, IUJPTL, member AESI — untuk PLTS dan PJU tenaga surya instansi.', ['SBU PLTS & IUJPTL', 'PJU tenaga surya', 'Dokumen tender lengkap', 'Tim lapangan bersertifikat'], 'business', 'cibitung-2000'],
-            'Komunitas' => ['Energi bersih untuk desa, sekolah & nelayan', 'Solusi surya untuk program pemberdayaan: listrik desa, sekolah, puskesmas, pompa air, hingga perahu nelayan.', ['Off grid & hybrid', 'PLTS kapal nelayan', 'Pompa air tenaga surya', 'Pelatihan operator lokal'], 'business', 'kapal-2'],
-            'Kemitraan EPC' => ['Partner andal untuk developer & EPC', 'Supply material, fabrikasi, manpower bersertifikat, hingga engineering — skalakan proyek Anda bersama kami.', ['Material Tier-1 via Energy Mart', 'Fabrikasi custom', 'Manpower Adisurya', 'Dukungan engineering'], 'business', 'medan-4004'],
+            'Proyek Pemerintah' => ['Mitra terpercaya untuk proyek energi pemerintah', 'Legalitas lengkap — SBU PLTS, IUJPTL, member AESI — untuk PLTS dan PJU tenaga surya instansi.', ['SBU PLTS & IUJPTL', 'PJU tenaga surya', 'Dokumen tender lengkap', 'Tim lapangan bersertifikat'], 'project', 'cibitung-2000'],
+            'Komunitas' => ['Energi bersih untuk desa, sekolah & nelayan', 'Solusi surya untuk program pemberdayaan: listrik desa, sekolah, puskesmas, pompa air, hingga perahu nelayan.', ['Off grid & hybrid', 'PLTS kapal nelayan', 'Pompa air tenaga surya', 'Pelatihan operator lokal'], 'project', 'kapal-2'],
+            'Kemitraan EPC' => ['Partner andal untuk developer & EPC', 'Supply material, fabrikasi, manpower bersertifikat, hingga engineering — skalakan proyek Anda bersama kami.', ['Material Tier-1 via Energy Mart', 'Fabrikasi custom', 'Manpower Adisurya', 'Dukungan engineering'], 'project', 'medan-4004'],
         ];
         $rows = [
             ['Hunian', 'heroicon-o-home-modern', 'Untuk rumah & perumahan', 'Paket PLTS rumah tangga siap pasang — hemat tagihan listrik, termasuk pengurusan perizinan PLN.', ['Rumah tinggal', 'Villa', 'Perumahan']],
@@ -392,10 +397,11 @@ class NeiraSeeder extends Seeder
     protected function content(): void
     {
         $banners = [
-            ['Building Indonesia’s Integrated Renewable Energy Ecosystem', 'Neira Energy', 'EPC • Manpower • Energy Trading • Digital Platform — mitra strategis transisi energi nasional.', 'hero', 'Konsultasi Gratis', null, 'Lihat Produk', '/produk'],
-            ['10+ MWp terpasang di 30+ kota', 'Portfolio', 'Dari rooftop pabrik hingga PLTS kapal nelayan — proyek energi bersih di seluruh Indonesia.', 'medan-4004', 'Lihat Portfolio', '/portfolio', null, null],
-            ['Tim khusus perizinan PLTS', 'Perizinan', 'Kuota IUPTLU dibuka hanya Januari & Juli. Kami bantu hingga NIDI & SLO terbit.', 'cikarang-504', 'Pelajari', '/halaman/perizinan-plts', 'Konsultasi', null],
+            ['Ubah atap Anda jadi sumber hemat listrik', null, 'Hitung penghematan dalam hitungan detik, dapatkan paket yang pas, lalu biarkan tim Neira mengurus desain, instalasi, hingga izin PLN dan SLO.', 'hero', 'Hitung penghematan', '#kalkulator', 'Lihat produk', '/produk'],
+            ['10+ MWp terpasang di 30+ kota', null, 'Dari atap pabrik hingga PLTS kapal nelayan, proyek energi bersih di seluruh Indonesia.', 'medan-4004', 'Lihat portfolio', '/portfolio', null, null],
+            ['Kuota PLTS atap hanya dibuka Januari & Juli', null, 'Tim khusus perizinan kami menyiapkan dokumen hingga NIDI dan SLO terbit, supaya Anda tidak melewatkan periode kuota.', 'cikarang-504', 'Pelajari perizinan', '/halaman/perizinan-plts', null, null],
         ];
+        Banner::query()->delete();
         foreach ($banners as $i => [$t, $s, $d, $img, $c1, $u1, $c2, $u2]) {
             Banner::updateOrCreate(['title' => $t], ['subtitle' => $s, 'description' => $d, 'image' => $this->asset($img), 'cta_label' => $c1, 'cta_url' => $u1, 'cta2_label' => $c2, 'cta2_url' => $u2, 'sort' => $i, 'is_active' => true]);
         }

@@ -7,7 +7,7 @@
     <div class="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-accent-500/20 blur-3xl"></div>
     <div class="container-x relative py-14 sm:py-20">
         @if($crumbs)
-            <nav class="mb-4 flex flex-wrap items-center gap-1.5 text-xs text-brand-100/70">
+            <nav class="mb-4 flex flex-wrap items-center gap-1.5 text-xs text-brand-100/80">
                 <a href="{{ route('home') }}" class="hover:text-white">Beranda</a>
                 @foreach($crumbs as $label => $url)
                     <x-heroicon-m-chevron-right class="h-3.5 w-3.5"/>
@@ -15,8 +15,7 @@
                 @endforeach
             </nav>
         @endif
-        @if($eyebrow)<p class="eyebrow">{{ $eyebrow }}</p>@endif
-        <h1 class="mt-2 max-w-3xl text-3xl font-bold tracking-tight text-white sm:text-5xl">{{ $title }}</h1>
+        <h1 class="max-w-3xl text-balance text-3xl font-bold tracking-tight text-white sm:text-5xl">{{ $title }}</h1>
         @if($subtitle)<p class="mt-4 max-w-2xl text-base text-brand-100/85 sm:text-lg">{{ $subtitle }}</p>@endif
         {{ $slot }}
     </div>

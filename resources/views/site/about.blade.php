@@ -9,16 +9,16 @@
             <div class="space-y-6">
                 @if(setting('about.vision'))
                     <div class="rounded-3xl bg-brand-600 p-8 text-white">
-                        <p class="eyebrow text-sun-400">Visi</p>
+                        <h2 class="text-sm font-semibold text-sun-300">Visi</h2>
                         <p class="mt-3 text-xl font-semibold leading-relaxed text-white">{{ setting('about.vision') }}</p>
                     </div>
                 @endif
                 @if($missions = setting('about.missions'))
                     <div class="rounded-3xl border border-slate-200 p-8">
-                        <p class="eyebrow">Misi</p>
+                        <h2 class="text-lg font-bold text-slate-900">Misi</h2>
                         <ol class="mt-4 space-y-3">
                             @foreach($missions as $i => $m)
-                                <li class="flex gap-4"><span class="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-accent-500 text-sm font-bold text-white">{{ str_pad($i + 1, 2, '0', STR_PAD_LEFT) }}</span><span class="pt-1">{{ is_array($m) ? ($m['text'] ?? '') : $m }}</span></li>
+                                <li class="flex gap-4"><span class="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-accent-500 text-sm font-bold text-brand-950">{{ str_pad($i + 1, 2, '0', STR_PAD_LEFT) }}</span><span class="pt-1">{{ is_array($m) ? ($m['text'] ?? '') : $m }}</span></li>
                             @endforeach
                         </ol>
                     </div>
@@ -83,7 +83,7 @@
     @if($esg = setting('about.esg'))
         <section class="section bg-brand-950 text-white">
             <div class="container-x">
-                <div class="mx-auto max-w-2xl text-center"><p class="eyebrow">Sustainability & Governance</p><h2 class="mt-2 text-3xl font-bold text-white">Komitmen ESG</h2></div>
+                <div class="mx-auto max-w-2xl text-center"><h2 class="text-3xl font-bold text-white">Komitmen ESG</h2><p class="mt-2 text-brand-100/80">Sustainability & governance di seluruh ekosistem Neira.</p></div>
                 <div class="mt-10 grid gap-6 md:grid-cols-3">
                     @foreach($esg as $e)
                         <div class="rounded-2xl border border-white/10 bg-white/5 p-6"><h3 class="font-semibold text-sun-400">{{ $e['title'] ?? '' }}</h3><p class="mt-2 text-sm text-white/75">{{ $e['text'] ?? '' }}</p></div>

@@ -42,6 +42,15 @@ class PublicSiteTest extends TestCase
             ->assertDontSee('Partner andal untuk developer');
     }
 
+    public function test_home_has_single_h1_and_no_kicker_labels(): void
+    {
+        $html = $this->get('/')->assertOk()->getContent();
+        $this->assertSame(1, substr_count($html, '<h1'));
+        $this->assertStringNotContainsString('class="eyebrow"', $html);
+        $this->assertStringContainsString('id="kalkulator"', $html);
+        $this->assertStringContainsString('"profile":"project"', $html);
+    }
+
     public function test_hero_video_and_motion_settings(): void
     {
         \App\Models\Banner::query()->first()->update(['video_url' => 'https://cdn.example.com/hero.mp4']);

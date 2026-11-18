@@ -3,6 +3,7 @@
 @section('content')
     <x-page-hero :title="$promo->title" :subtitle="$promo->short_description" :eyebrow="'Diskon '.$promo->label" :image="media($promo->image)" :crumbs="['Promo' => route('promos.index'), $promo->title => null]">
         <div class="mt-6 flex flex-wrap items-center gap-3 text-sm text-white/85">
+            <span class="rounded-full bg-sun-400 px-3 py-1 text-xs font-bold text-brand-950">Diskon {{ $promo->label }}</span>
             @if($promo->code)<span class="rounded-lg border border-dashed border-sun-400 px-3 py-1.5 font-mono font-semibold text-sun-400">Kode: {{ $promo->code }}</span>@endif
             @if($promo->ends_at)<span>Berlaku s.d. {{ $promo->ends_at->translatedFormat('d F Y') }}</span>@endif
             @unless($promo->isRunning())<span class="rounded-full bg-red-500 px-3 py-1 text-xs font-semibold text-white">Promo telah berakhir</span>@endunless

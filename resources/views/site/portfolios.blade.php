@@ -11,7 +11,7 @@
                 @endforeach
                 <span class="mx-2 hidden w-px bg-slate-200 sm:block"></span>
                 @foreach($segments as $s)
-                    <a href="{{ route('portfolio.index', ['segmen' => $s->slug]) }}" class="btn {{ request('segmen') === $s->slug ? 'bg-accent-500 text-white' : 'border border-slate-200 bg-white' }}">{{ $s->name }}</a>
+                    <a href="{{ route('portfolio.index', ['segmen' => $s->slug]) }}" class="btn {{ request('segmen') === $s->slug ? 'bg-accent-500 text-brand-950' : 'border border-slate-200 bg-white' }}">{{ $s->name }}</a>
                 @endforeach
             </div>
             <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

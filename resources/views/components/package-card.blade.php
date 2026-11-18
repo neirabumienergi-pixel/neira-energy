@@ -10,7 +10,7 @@
         @endif
         <span class="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-sm font-bold text-brand-700 shadow">{{ $package->capacity_label }}</span>
         @if($promo)
-            <span class="absolute right-3 top-3 rounded-full bg-accent-500 px-3 py-1 text-xs font-bold text-white shadow">PROMO {{ $promo->label }}</span>
+            <span class="absolute right-3 top-3 rounded-full bg-accent-500 px-3 py-1 text-xs font-bold text-brand-950 shadow">PROMO {{ $promo->label }}</span>
         @endif
     </div>
     <div class="flex flex-1 flex-col p-5">
@@ -19,25 +19,25 @@
         @if($package->short_description)<p class="mt-2 line-clamp-2 text-sm text-slate-500">{{ $package->short_description }}</p>@endif
         <dl class="mt-4 grid grid-cols-2 gap-2 text-xs">
             @if($package->est_production_kwh_month)
-                <div class="rounded-lg bg-slate-50 p-2"><dt class="text-slate-400">Produksi</dt><dd class="font-semibold text-slate-800">± {{ number_format($package->est_production_kwh_month, 0, ',', '.') }} kWh/bln</dd></div>
+                <div class="rounded-lg bg-slate-50 p-2"><dt class="text-slate-500">Produksi</dt><dd class="font-semibold text-slate-800">± {{ number_format($package->est_production_kwh_month, 0, ',', '.') }} kWh/bln</dd></div>
             @endif
             @if($package->battery_kwh)
-                <div class="rounded-lg bg-slate-50 p-2"><dt class="text-slate-400">Baterai</dt><dd class="font-semibold text-slate-800">{{ rtrim(rtrim(number_format($package->battery_kwh, 2, ',', '.'), '0'), ',') }} kWh</dd></div>
+                <div class="rounded-lg bg-slate-50 p-2"><dt class="text-slate-500">Baterai</dt><dd class="font-semibold text-slate-800">{{ rtrim(rtrim(number_format($package->battery_kwh, 2, ',', '.'), '0'), ',') }} kWh</dd></div>
             @endif
             @if($package->area_required_m2)
-                <div class="rounded-lg bg-slate-50 p-2"><dt class="text-slate-400">Area</dt><dd class="font-semibold text-slate-800">± {{ number_format($package->area_required_m2, 0, ',', '.') }} m²</dd></div>
+                <div class="rounded-lg bg-slate-50 p-2"><dt class="text-slate-500">Area</dt><dd class="font-semibold text-slate-800">± {{ number_format($package->area_required_m2, 0, ',', '.') }} m²</dd></div>
             @endif
             @if($package->phase)
-                <div class="rounded-lg bg-slate-50 p-2"><dt class="text-slate-400">Listrik</dt><dd class="font-semibold text-slate-800">{{ $package->phase }}</dd></div>
+                <div class="rounded-lg bg-slate-50 p-2"><dt class="text-slate-500">Listrik</dt><dd class="font-semibold text-slate-800">{{ $package->phase }}</dd></div>
             @endif
         </dl>
         <div class="mt-auto pt-5">
             @if($showPrice && $package->base_price)
                 @if($promo || $package->strike_price)
-                    <p class="text-xs text-slate-400 line-through">{{ rupiah($promo ? $package->base_price : $package->strike_price) }}</p>
+                    <p class="text-xs text-slate-500 line-through">{{ rupiah($promo ? $package->base_price : $package->strike_price) }}</p>
                 @endif
                 <p class="text-xl font-bold text-slate-900">{{ rupiah($final) }}</p>
-                @if($package->price_note)<p class="text-[11px] text-slate-400">{{ $package->price_note }}</p>@endif
+                @if($package->price_note)<p class="text-xs text-slate-500">{{ $package->price_note }}</p>@endif
             @else
                 <p class="text-sm font-semibold text-brand-600">Hubungi kami untuk penawaran</p>
             @endif

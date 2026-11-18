@@ -4,7 +4,7 @@
         @if($post->cover)<img src="{{ media($post->cover) }}" alt="{{ $post->title }}" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">@endif
     </div>
     <div class="flex flex-1 flex-col p-5">
-        <div class="flex items-center gap-2 text-xs text-slate-400">
+        <div class="flex items-center gap-2 text-xs text-slate-500">
             @if($post->category)<span class="chip">{{ $post->category->name }}</span>@endif
             <span>{{ $post->published_at?->translatedFormat('d M Y') }}</span>
         </div>

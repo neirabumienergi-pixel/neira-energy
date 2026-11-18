@@ -91,9 +91,12 @@ class CompanySettings extends Page implements HasForms
                     Forms\Components\RichEditor::make('about.body')->label('Profil perusahaan')->columnSpanFull(),
                     Forms\Components\Textarea::make('about.vision')->label('Visi')->rows(2)->columnSpanFull(),
                     Forms\Components\Repeater::make('about.missions')->label('Misi')->simple(Forms\Components\TextInput::make('text')->required())->columnSpanFull(),
-                    Forms\Components\Repeater::make('about.why')->label('Kenapa Neira berbeda?')->schema([
-                        $text('icon', 'Ikon heroicon'), $text('title', 'Judul')->required(), Forms\Components\Textarea::make('text')->label('Teks')->rows(2),
-                    ])->columns(3)->columnSpanFull(),
+                    Forms\Components\Repeater::make('about.why')->label('Keunggulan Neira (beranda & tentang kami)')->schema([
+                        $text('title', 'Judul')->required(), $text('icon', 'Ikon heroicon (halaman Tentang)'),
+                        Forms\Components\Textarea::make('text')->label('Teks')->rows(3)->columnSpanFull(),
+                        Fields::image('image', 'Foto (beranda)', 'brand'),
+                        Forms\Components\Grid::make(1)->schema([$text('url', 'Link (opsional)'), $text('link_label', 'Teks link')->placeholder('Selengkapnya')]),
+                    ])->columns(2)->collapsible()->itemLabel(fn (array $state) => $state['title'] ?? null)->columnSpanFull(),
                     Forms\Components\Repeater::make('about.esg')->label('Komitmen ESG')->schema([
                         $text('title', 'Judul')->required(), Forms\Components\Textarea::make('text')->label('Teks')->rows(2),
                     ])->columns(2)->columnSpanFull(),

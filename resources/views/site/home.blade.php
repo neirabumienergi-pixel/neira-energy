@@ -3,43 +3,68 @@
 @section('content')
     @include('partials.hero')
 
-    {{-- Stats --}}
-    @if($stats = setting('stats'))
+    {{-- Angka + legalitas: bukti kepercayaan langsung di bawah hero --}}
+    @php($stats = setting('stats') ?: [])
+    @if($stats || $certifications->isNotEmpty())
         <section class="relative z-10 -mt-14">
             <div class="container-x">
-                <div class="grid grid-cols-2 gap-px overflow-hidden rounded-2xl bg-slate-200 shadow-xl lg:grid-cols-4">
-                    @foreach($stats as $s)
-                        <div class="bg-white px-6 py-6 text-center">
-                            <p class="text-3xl font-extrabold text-brand-600">{{ $s['value'] ?? '' }}<span class="ml-1 text-lg text-accent-500">{{ $s['unit'] ?? '' }}</span></p>
-                            <p class="mt-1 text-xs text-slate-500 sm:text-sm">{{ $s['label'] ?? '' }}</p>
+                <div class="overflow-hidden rounded-2xl bg-white shadow-[0_18px_50px_-24px_rgba(4,36,20,.45)]">
+                    @if($stats)
+                        <dl class="grid grid-cols-2 divide-slate-200 lg:grid-cols-4 lg:divide-x [&>div:nth-child(-n+2)]:border-b [&>div:nth-child(-n+2)]:border-slate-200 lg:[&>div:nth-child(-n+2)]:border-b-0">
+                            @foreach($stats as $s)
+                                <div class="flex flex-col-reverse px-5 py-6 text-center sm:px-6">
+                                    <dt class="mt-1 text-sm text-slate-600">{{ $s['label'] ?? '' }}</dt>
+                                    <dd class="text-3xl font-extrabold tabular-nums tracking-tight text-brand-700">{{ $s['value'] ?? '' }}@if(!empty($s['unit']))<span class="ml-1 text-base font-bold text-accent-800">{{ $s['unit'] }}</span>@endif</dd>
+                                </div>
+                            @endforeach
+                        </dl>
+                    @endif
+                    @if($certifications->isNotEmpty())
+                        <div class="border-t border-slate-200 bg-slate-50 px-5 py-4 sm:px-6">
+                            <ul class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-700">
+                                <li class="font-semibold text-slate-900">Legal & tersertifikasi:</li>
+                                @foreach($certifications as $c)
+                                    <li class="flex items-center gap-1.5">
+                                        @if($c->status === 'active')
+                                            <x-heroicon-s-check-badge class="h-4 w-4 text-brand-600"/>{{ $c->name }}
+                                        @else
+                                            <x-heroicon-o-clock class="h-4 w-4 text-accent-800"/>{{ $c->name }} <span class="text-slate-500">(proses)</span>
+                                        @endif
+                                    </li>
+                                @endforeach
+                            </ul>
                         </div>
-                    @endforeach
+                    @endif
                 </div>
+                @if(collect($stats)->contains(fn ($s) => str_contains($s['label'] ?? '', '*')))
+                    <p class="mt-2 text-right text-xs text-slate-500">* Berdasarkan faktor emisi grid & performa sistem terpasang.</p>
+                @endif
             </div>
         </section>
     @endif
 
-    {{-- Products --}}
+    {{-- Produk --}}
     <section class="section">
         <div class="container-x">
             <div class="flex flex-wrap items-end justify-between gap-4">
-                <x-section-heading eyebrow="Produk & Layanan" title="Solusi energi surya end-to-end" text="Dari perencanaan, pengadaan, instalasi, hingga perizinan dan perawatan — satu mitra untuk seluruh kebutuhan energi surya Anda."/>
+                <x-section-heading title="Solusi energi surya end-to-end" text="Dari perencanaan, pengadaan, instalasi, hingga perizinan dan perawatan. Satu mitra untuk seluruh kebutuhan energi surya Anda."/>
                 <a href="{{ route('products.index') }}" class="btn-outline">Semua produk <x-heroicon-m-arrow-right class="h-4 w-4"/></a>
             </div>
             <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-{{ min(5, max(3, $categories->count())) }}">
                 @foreach($categories as $cat)
                     <a href="{{ $cat->url() }}" @if($cat->external_url) target="_blank" rel="noopener" @endif class="card group flex flex-col">
-                        <div class="relative aspect-[4/3] overflow-hidden bg-brand-50">
-                            @if($cat->image)<img src="{{ media($cat->image) }}" alt="{{ $cat->name }}" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">@endif
-                            <div class="absolute left-4 top-4 grid h-11 w-11 place-items-center rounded-xl bg-white text-brand-600 shadow"><x-icon :name="$cat->icon" class="h-6 w-6"/></div>
+                        <div class="relative aspect-[4/3] overflow-hidden bg-brand-900">
+                            @if($cat->image)
+                                <img src="{{ media($cat->image) }}" alt="" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                            @else
+                                <div class="grid h-full place-items-center"><x-icon :name="$cat->icon" class="h-14 w-14 text-sun-400"/></div>
+                            @endif
                         </div>
                         <div class="flex flex-1 flex-col p-5">
-                            <h3 class="text-lg font-semibold text-slate-900 group-hover:text-brand-600">{{ $cat->name }}</h3>
-                            <p class="mt-1 line-clamp-3 text-sm text-slate-500">{{ $cat->short_description }}</p>
+                            <h3 class="text-lg font-semibold text-slate-900 group-hover:text-brand-700">{{ $cat->name }}</h3>
+                            <p class="mt-1 line-clamp-3 text-sm text-slate-600">{{ $cat->short_description }}</p>
                             @if($cat->children->isNotEmpty())
-                                <div class="mt-3 flex flex-wrap gap-1.5">
-                                    @foreach($cat->children->take(4) as $c)<span class="chip">{{ $c->name }}</span>@endforeach
-                                </div>
+                                <p class="mt-auto pt-4 text-xs leading-relaxed text-slate-500">{{ $cat->children->take(4)->pluck('name')->implode(' · ') }}</p>
                             @endif
                         </div>
                     </a>
@@ -48,33 +73,14 @@
         </div>
     </section>
 
-    {{-- Segments --}}
-    @if($segments->isNotEmpty())
-        <section class="section bg-brand-950 text-white">
-            <div class="container-x">
-                <div class="max-w-2xl">
-                    <p class="eyebrow">Solusi untuk setiap segmen</p>
-                    <h2 class="mt-2 text-3xl font-bold text-white sm:text-4xl">Kami memahami kebutuhan Anda</h2>
-                </div>
-                <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-                    @foreach($segments as $seg)
-                        <a href="{{ route('segments.show', $seg) }}" class="group rounded-2xl border border-white/10 bg-white/5 p-6 transition hover:border-accent-500 hover:bg-white/10">
-                            <x-icon :name="$seg->icon" class="h-8 w-8 text-sun-400"/>
-                            <h3 class="mt-4 font-semibold text-white">{{ $seg->name }}</h3>
-                            <p class="mt-2 line-clamp-3 text-sm text-white/70">{{ $seg->short_description }}</p>
-                            <span class="mt-4 inline-flex items-center gap-1 text-sm font-medium text-accent-400 group-hover:gap-2 transition-all">Selengkapnya <x-heroicon-m-arrow-right class="h-4 w-4"/></span>
-                        </a>
-                    @endforeach
-                </div>
-            </div>
-        </section>
-    @endif
-
-    {{-- Featured packages --}}
+    {{-- Paket unggulan --}}
     @if($featuredPackages->isNotEmpty())
         <section class="section bg-slate-50">
             <div class="container-x">
-                <x-section-heading eyebrow="Paket Unggulan" title="Paket siap pasang, harga transparan" center/>
+                <div class="flex flex-wrap items-end justify-between gap-4">
+                    <x-section-heading title="Paket siap pasang, harga transparan" text="Harga tertera per paket. Hitung dulu kebutuhan Anda di kalkulator untuk rekomendasi yang pas."/>
+                    <a href="#kalkulator" class="btn-outline"><x-heroicon-o-calculator class="h-4 w-4"/> Hitung kebutuhan</a>
+                </div>
                 <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach($featuredPackages as $p)<x-package-card :package="$p"/>@endforeach
                 </div>
@@ -82,19 +88,19 @@
         </section>
     @endif
 
-    {{-- Promos --}}
+    {{-- Promo --}}
     @if($promos->isNotEmpty())
         <section class="section">
             <div class="container-x">
-                <x-section-heading eyebrow="Promo" title="Penawaran spesial bulan ini"/>
+                <x-section-heading title="Penawaran spesial bulan ini"/>
                 <div class="mt-8 grid gap-6 md:grid-cols-{{ min(3, $promos->count()) }}">
                     @foreach($promos as $promo)
-                        <a href="{{ route('promos.show', $promo) }}" class="card group relative flex items-center gap-5 bg-gradient-to-br from-accent-50 to-white p-6">
-                            <div class="grid h-20 w-20 shrink-0 place-items-center rounded-2xl bg-accent-500 text-center text-lg font-extrabold leading-tight text-white">{{ $promo->label }}</div>
+                        <a href="{{ route('promos.show', $promo) }}" class="card group relative flex items-center gap-5 p-6">
+                            <div class="grid h-20 w-20 shrink-0 place-items-center rounded-xl bg-sun-400 text-center text-lg font-extrabold leading-tight text-brand-950">{{ $promo->label }}</div>
                             <div>
-                                <h3 class="font-semibold text-slate-900 group-hover:text-brand-600">{{ $promo->title }}</h3>
-                                <p class="mt-1 line-clamp-2 text-sm text-slate-500">{{ $promo->short_description }}</p>
-                                @if($promo->ends_at)<p class="mt-2 text-xs font-medium text-accent-700">s.d. {{ $promo->ends_at->translatedFormat('d F Y') }}</p>@endif
+                                <h3 class="font-semibold text-slate-900 group-hover:text-brand-700">{{ $promo->title }}</h3>
+                                <p class="mt-1 line-clamp-2 text-sm text-slate-600">{{ $promo->short_description }}</p>
+                                @if($promo->ends_at)<p class="mt-2 text-xs font-medium text-accent-800">Berlaku s.d. {{ $promo->ends_at->translatedFormat('d F Y') }}</p>@endif
                             </div>
                         </a>
                     @endforeach
@@ -103,35 +109,28 @@
         </section>
     @endif
 
-    {{-- Why us --}}
+    {{-- Bukti: kemampuan khas Neira (diatur di Identitas Perusahaan → Tentang Kami) --}}
     @if($why = setting('about.why'))
         <section class="section {{ $promos->isNotEmpty() ? 'bg-slate-50' : '' }}">
-            <div class="container-x grid items-center gap-12 lg:grid-cols-2">
-                <div>
-                    <p class="eyebrow">Kenapa Neira?</p>
-                    <h2 class="section-title mt-2">Mitra energi surya end-to-end di Indonesia</h2>
-                    <div class="mt-8 grid gap-5 sm:grid-cols-2">
-                        @foreach($why as $w)
-                            <div>
-                                <div class="grid h-11 w-11 place-items-center rounded-xl bg-brand-500 text-white"><x-icon :name="$w['icon'] ?? null" class="h-6 w-6"/></div>
-                                <h3 class="mt-3 font-semibold text-slate-900">{{ $w['title'] ?? '' }}</h3>
-                                <p class="mt-1 text-sm text-slate-600">{{ $w['text'] ?? '' }}</p>
+            <div class="container-x">
+                <x-section-heading title="Dikerjakan sendiri, dari workshop sampai izin terbit" text="Tiga hal yang membuat proyek Anda tidak bergantung pada pihak lain."/>
+                <div class="mt-12 space-y-14 lg:space-y-20">
+                    @foreach($why as $i => $w)
+                        <article class="grid items-center gap-8 lg:grid-cols-12 lg:gap-12">
+                            @if(!empty($w['image']))
+                                <div class="lg:col-span-7 {{ $i % 2 ? 'lg:order-2' : '' }}">
+                                    <img src="{{ media($w['image']) }}" alt="" loading="lazy" class="aspect-[16/10] w-full rounded-2xl object-cover">
+                                </div>
+                            @endif
+                            <div class="{{ !empty($w['image']) ? 'lg:col-span-5' : 'lg:col-span-8' }}">
+                                <h3 class="text-2xl font-bold tracking-tight text-balance text-slate-900 sm:text-3xl">{{ $w['title'] ?? '' }}</h3>
+                                <p class="mt-4 max-w-prose leading-relaxed text-slate-600">{{ $w['text'] ?? '' }}</p>
+                                @if(!empty($w['url']))
+                                    <a href="{{ $w['url'] }}" class="mt-6 inline-flex items-center gap-1.5 font-semibold text-brand-700 hover:text-brand-800">{{ $w['link_label'] ?? 'Selengkapnya' }} <x-heroicon-m-arrow-right class="h-4 w-4"/></a>
+                                @endif
                             </div>
-                        @endforeach
-                    </div>
-                </div>
-                <div class="relative">
-                    <img src="{{ media(setting('about.image'), 'images/logo.png') }}" alt="" class="aspect-[4/5] w-full rounded-3xl object-cover shadow-xl" loading="lazy">
-                    @if($certifications->isNotEmpty())
-                        <div class="absolute -bottom-6 -left-4 max-w-xs rounded-2xl bg-white p-5 shadow-xl sm:-left-8">
-                            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Legalitas</p>
-                            <ul class="mt-2 space-y-1.5 text-sm">
-                                @foreach($certifications->take(5) as $c)
-                                    <li class="flex items-center gap-2"><x-heroicon-s-check-badge class="h-4 w-4 {{ $c->status === 'active' ? 'text-brand-500' : 'text-accent-500' }}"/>{{ $c->name }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
+                        </article>
+                    @endforeach
                 </div>
             </div>
         </section>
@@ -142,7 +141,7 @@
         <section class="section">
             <div class="container-x">
                 <div class="flex flex-wrap items-end justify-between gap-4">
-                    <x-section-heading eyebrow="Portfolio" title="Proyek yang telah kami bangun"/>
+                    <x-section-heading title="Proyek yang telah kami bangun"/>
                     <a href="{{ route('portfolio.index') }}" class="btn-outline">Lihat semua <x-heroicon-m-arrow-right class="h-4 w-4"/></a>
                 </div>
                 <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -152,17 +151,17 @@
         </section>
     @endif
 
-    {{-- Clients --}}
+    {{-- Klien --}}
     @if($clients->isNotEmpty())
-        <section class="border-y border-slate-100 bg-white py-12">
+        <section class="border-y border-slate-200 bg-white py-12">
             <div class="container-x">
-                <p class="text-center text-sm font-semibold uppercase tracking-wider text-slate-400">Dipercaya oleh klien & partner</p>
+                <h2 class="text-center text-sm font-semibold text-slate-600">Dipercaya oleh klien & partner</h2>
                 <div class="mt-8 flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
                     @foreach($clients as $c)
                         @if($c->logo)
                             <img src="{{ media($c->logo) }}" alt="{{ $c->name }}" title="{{ $c->name }}" class="h-10 w-auto opacity-70 grayscale transition hover:opacity-100 hover:grayscale-0" loading="lazy">
                         @else
-                            <span class="text-sm font-semibold text-slate-400">{{ $c->name }}</span>
+                            <span class="text-sm font-semibold text-slate-600">{{ $c->name }}</span>
                         @endif
                     @endforeach
                 </div>
@@ -170,19 +169,19 @@
         </section>
     @endif
 
-    {{-- Testimonials --}}
+    {{-- Testimoni --}}
     @if($testimonials->isNotEmpty())
         <section class="section bg-slate-50">
             <div class="container-x">
-                <x-section-heading eyebrow="Testimoni" title="Kata mereka tentang Neira" center/>
+                <x-section-heading title="Kata mereka tentang Neira" center/>
                 <div class="mt-10 grid gap-6 md:grid-cols-3">
                     @foreach($testimonials as $t)
                         <figure class="rounded-2xl bg-white p-6 shadow-sm">
-                            <div class="text-accent-500">{{ str_repeat('★', $t->rating) }}</div>
+                            <div class="flex gap-0.5 text-accent-500" aria-label="Rating {{ $t->rating }} dari 5">@for($r = 0; $r < $t->rating; $r++)<x-heroicon-s-star class="h-4 w-4"/>@endfor</div>
                             <blockquote class="mt-3 text-slate-700">“{{ $t->content }}”</blockquote>
                             <figcaption class="mt-5 flex items-center gap-3">
                                 @if($t->photo)<img src="{{ media($t->photo) }}" class="h-10 w-10 rounded-full object-cover" alt="">@endif
-                                <div><p class="font-semibold text-slate-900">{{ $t->name }}</p><p class="text-xs text-slate-500">{{ trim($t->position.' · '.$t->company, ' ·') }}</p></div>
+                                <div><p class="font-semibold text-slate-900">{{ $t->name }}</p><p class="text-xs text-slate-600">{{ trim($t->position.' · '.$t->company, ' ·') }}</p></div>
                             </figcaption>
                         </figure>
                     @endforeach
@@ -191,12 +190,12 @@
         </section>
     @endif
 
-    {{-- Blog --}}
-    @if($posts->isNotEmpty())
+    {{-- Artikel: tampil bila sudah ada minimal 3 --}}
+    @if($posts->count() >= 3)
         <section class="section">
             <div class="container-x">
                 <div class="flex flex-wrap items-end justify-between gap-4">
-                    <x-section-heading eyebrow="Artikel" title="Wawasan energi terbarukan"/>
+                    <x-section-heading title="Wawasan energi terbarukan"/>
                     <a href="{{ route('blog.index') }}" class="btn-outline">Semua artikel <x-heroicon-m-arrow-right class="h-4 w-4"/></a>
                 </div>
                 <div class="mt-10 grid gap-6 md:grid-cols-3">
@@ -206,5 +205,17 @@
         </section>
     @endif
 
-    @include('blocks.cta', ['data' => ['title' => 'Siap beralih ke energi surya?', 'text' => 'Konsultasikan kebutuhan Anda dengan tim engineer kami. Gratis survei & simulasi penghematan.', 'button_label' => 'Konsultasi via WhatsApp'], 'index' => 0])
+    {{-- Penutup: kembali ke kalkulator --}}
+    <section class="no-print py-14">
+        <div class="container-x">
+            <div class="relative overflow-hidden rounded-2xl bg-brand-800 px-6 py-12 text-center sm:px-12">
+                <h2 class="text-2xl font-bold text-balance text-white sm:text-3xl">Berapa yang bisa Anda hemat setiap bulan?</h2>
+                <p class="mx-auto mt-3 max-w-xl text-brand-50">Geser tagihan listrik Anda di kalkulator, lalu kirim hasilnya ke tim kami. Survei dan desain gratis.</p>
+                <div class="mt-7 flex flex-wrap justify-center gap-3">
+                    <a href="#kalkulator" class="btn-accent px-6 py-3"><x-heroicon-o-calculator class="h-4 w-4"/> Hitung penghematan</a>
+                    <a href="{{ wa_link() }}" target="_blank" rel="noopener" class="btn-ghost-light px-6 py-3">Konsultasi via WhatsApp</a>
+                </div>
+            </div>
+        </div>
+    </section>
 @endsection

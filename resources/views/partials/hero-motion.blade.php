@@ -1,5 +1,5 @@
 {{-- Motion graphic hero: sinar matahari, aliran energi, partikel. Animasi di resources/css/app.css (.hero-motion) --}}
-<div class="hero-motion pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+<div class="hero-motion pointer-events-none absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_right,transparent_5%,black_60%)] max-lg:[mask-image:linear-gradient(to_bottom,transparent_30%,black_75%)]" aria-hidden="true">
     <svg viewBox="0 0 1440 800" preserveAspectRatio="xMidYMid slice" class="h-full w-full">
         <defs>
             <radialGradient id="hm-sun" cx="50%" cy="50%" r="50%">

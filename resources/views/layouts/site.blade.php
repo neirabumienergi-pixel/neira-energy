@@ -94,7 +94,7 @@
 
             <div class="flex items-center gap-2">
                 <a href="{{ wa_link() }}" target="_blank" rel="noopener" class="btn-primary hidden sm:inline-flex">
-                    <x-heroicon-s-chat-bubble-left-right class="h-4 w-4"/> Konsultasi Gratis
+                    <x-heroicon-s-chat-bubble-left-right class="h-4 w-4"/> Konsultasi via WhatsApp
                 </a>
                 <button @click="open = !open" class="rounded-lg p-2 text-slate-700 lg:hidden" aria-label="Menu">
                     <x-heroicon-o-bars-3 x-show="!open" class="h-6 w-6"/>
@@ -106,11 +106,11 @@
         {{-- Mobile menu --}}
         <div x-show="open" x-collapse x-cloak class="border-t border-slate-100 bg-white lg:hidden">
             <div class="container-x max-h-[75vh] space-y-1 overflow-y-auto py-4 text-sm font-medium">
-                <p class="px-2 pt-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Produk & Layanan</p>
+                <p class="px-2 pt-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Produk & Layanan</p>
                 @foreach($navCategories as $cat)
                     <a href="{{ $cat->url() }}" class="block rounded-lg px-2 py-2 hover:bg-brand-50">{{ $cat->name }}</a>
                 @endforeach
-                <p class="px-2 pt-3 text-xs font-semibold uppercase tracking-wider text-slate-400">Solusi</p>
+                <p class="px-2 pt-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Solusi</p>
                 @foreach($navSegments as $seg)
                     <a href="{{ route('segments.show', $seg) }}" class="block rounded-lg px-2 py-2 hover:bg-brand-50">{{ $seg->name }}</a>
                 @endforeach
@@ -122,7 +122,7 @@
                 <a href="{{ route('gallery.index') }}" class="block rounded-lg px-2 py-2 hover:bg-brand-50">Galeri</a>
                 <a href="{{ route('faq') }}" class="block rounded-lg px-2 py-2 hover:bg-brand-50">FAQ</a>
                 <a href="{{ route('contact') }}" class="block rounded-lg px-2 py-2 hover:bg-brand-50">Kontak</a>
-                <a href="{{ wa_link() }}" target="_blank" rel="noopener" class="btn-primary mt-3 w-full">Konsultasi Gratis via WhatsApp</a>
+                <a href="{{ wa_link() }}" target="_blank" rel="noopener" class="btn-primary mt-3 w-full">Konsultasi via WhatsApp</a>
             </div>
         </div>
     </header>
@@ -193,14 +193,16 @@
         </div>
         <div class="border-t border-white/10">
             <div class="container-x flex flex-col items-center justify-between gap-2 py-5 text-xs sm:flex-row">
-                <p>&copy; {{ date('Y') }} {{ setting('company.legal_name', $siteName) }}. All rights reserved.</p>
+                <p>&copy; {{ date('Y') }} {{ setting('company.legal_name', $siteName) }}. Hak cipta dilindungi.</p>
                 <p>{{ setting('company.slogan') }}</p>
             </div>
         </div>
     </footer>
 
     {{-- Floating WhatsApp --}}
-    <a href="{{ wa_link() }}" target="_blank" rel="noopener" aria-label="WhatsApp"
+    <a href="{{ wa_link() }}" target="_blank" rel="noopener" aria-label="Konsultasi via WhatsApp"
+       x-data="{ show: window.innerWidth >= 1024 || window.scrollY > 900 }" @scroll.window.throttle.150ms="show = window.innerWidth >= 1024 || window.scrollY > 900"
+       :class="show ? 'opacity-100 translate-y-0' : 'pointer-events-none opacity-0 translate-y-3'"
        class="no-print fixed bottom-5 right-5 z-40 grid h-14 w-14 place-items-center rounded-full bg-[#25D366] text-white shadow-lg ring-4 ring-white transition hover:scale-105">
         <svg viewBox="0 0 24 24" class="h-7 w-7" fill="currentColor"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.64.07-.3-.15-1.26-.46-2.4-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.5h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.07 2.88 1.21 3.07.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.23 1.36.2 1.87.12.57-.08 1.76-.72 2.01-1.42.25-.7.25-1.29.17-1.42-.07-.12-.27-.2-.57-.35M12.05 21.5h-.01a9.4 9.4 0 0 1-4.8-1.32l-.34-.2-3.57.94.95-3.48-.22-.36a9.4 9.4 0 0 1-1.44-5.01c0-5.2 4.23-9.44 9.44-9.44 2.52 0 4.89.98 6.67 2.77a9.37 9.37 0 0 1 2.76 6.68c0 5.2-4.24 9.43-9.44 9.43m8.03-17.46A11.27 11.27 0 0 0 12.04.72C5.79.72.7 5.8.7 12.06c0 2 .52 3.95 1.52 5.67L.6 23.6l6.01-1.58a11.3 11.3 0 0 0 5.43 1.38h.01c6.25 0 11.34-5.08 11.34-11.34 0-3.03-1.18-5.88-3.32-8.02"/></svg>
     </a>

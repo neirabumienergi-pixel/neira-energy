@@ -6,7 +6,7 @@
     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
     <div class="absolute inset-x-0 bottom-0 p-5 text-white">
         <div class="flex flex-wrap gap-2">
-            @if($portfolio->capacity_label)<span class="rounded-full bg-accent-500 px-2.5 py-0.5 text-xs font-semibold">{{ $portfolio->capacity_label }}</span>@endif
+            @if($portfolio->capacity_label)<span class="rounded-full bg-sun-400 px-2.5 py-0.5 text-xs font-semibold text-brand-950">{{ $portfolio->capacity_label }}</span>@endif
             @if($portfolio->system_type)<span class="rounded-full bg-white/20 px-2.5 py-0.5 text-xs backdrop-blur">{{ $portfolio->system_type }}</span>@endif
         </div>
         <h3 class="mt-2 text-lg font-semibold leading-snug text-white">{{ $portfolio->title }}</h3>

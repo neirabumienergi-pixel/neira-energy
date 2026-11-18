@@ -27,6 +27,8 @@
     --color-accent-500: #f7941d;
     --color-accent-600: #e07a0b;
     --color-accent-700: #b95d0b;
+    --color-accent-800: #8f470c;
+    --color-accent-900: #6b350b;
     --color-sun-300: #fbe38a;
     --color-sun-400: #f9d84a;
 }
@@ -34,7 +36,13 @@
 @layer base {
     html { scroll-behavior: smooth; }
     body { @apply bg-white text-slate-700 antialiased; }
-    h1, h2, h3, h4 { @apply text-slate-900; }
+    ::selection { background: var(--color-sun-300); color: var(--color-brand-950); }
+    :focus-visible { outline: 2px solid var(--color-brand-600); outline-offset: 2px; }
+    a { text-underline-offset: 3px; }
+    input[type=range] { accent-color: var(--color-brand-600); }
+    .tabular-nums, table { font-variant-numeric: tabular-nums; }
+    h1, h2, h3, h4 { @apply text-slate-900; text-wrap: balance; }
+    p, li, dd, blockquote, figcaption { text-wrap: pretty; }
     [x-cloak] { display: none !important; }
 }
 
@@ -47,11 +55,11 @@
 }
 
 @utility btn-primary {
-    @apply btn bg-brand-500 text-white hover:bg-brand-600 focus-visible:ring-brand-500;
+    @apply btn bg-brand-600 text-white hover:bg-brand-700 focus-visible:ring-brand-600;
 }
 
 @utility btn-accent {
-    @apply btn bg-accent-500 text-white hover:bg-accent-600 focus-visible:ring-accent-500;
+    @apply btn bg-accent-500 text-brand-950 hover:bg-accent-400 focus-visible:ring-accent-500;
 }
 
 @utility btn-outline {
@@ -59,11 +67,11 @@
 }
 
 @utility btn-ghost-light {
-    @apply btn border border-white/40 text-white hover:bg-white/10;
+    @apply btn border border-white/45 bg-brand-950/40 text-white backdrop-blur hover:bg-white/10;
 }
 
 @utility eyebrow {
-    @apply text-xs font-semibold uppercase tracking-[0.18em] text-accent-500;
+    @apply text-xs font-semibold uppercase tracking-[0.18em] text-accent-800;
 }
 
 @utility section {
