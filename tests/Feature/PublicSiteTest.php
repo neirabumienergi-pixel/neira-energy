@@ -48,7 +48,8 @@ class PublicSiteTest extends TestCase
         $this->assertSame(1, substr_count($html, '<h1'));
         $this->assertStringNotContainsString('class="eyebrow"', $html);
         $this->assertStringContainsString('id="kalkulator"', $html);
-        $this->assertStringContainsString('"profile":"project"', $html);
+        $this->assertStringContainsString('project', $html);
+        $this->assertSame(3, \App\Models\Segment::where('calc_profile', 'project')->count());
     }
 
     public function test_hero_video_and_motion_settings(): void
