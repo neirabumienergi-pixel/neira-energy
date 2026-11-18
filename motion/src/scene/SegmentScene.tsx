@@ -113,7 +113,7 @@ export type SegmentConfig = {
   /** screen-space overlay drawn above everything (e.g. an app card) */
   /** seamless loop: scene starts fully built, no intro animation */
   loop?: boolean;
-  /** hide logo, title and captions (e.g. for a website hero background) */
+  /** hide title and captions (the logo stays), e.g. for a website hero */
   hideText?: boolean;
   /** vertical position of the ground's back corner (default 372) */
   originY?: number;
@@ -1239,17 +1239,17 @@ export const SegmentScene: React.FC<{ config: SegmentConfig }> = ({
       </AbsoluteFill>
 
       {/* Logo + title */}
-      {config.hideText ? null : (
-        <div style={{ position: "absolute", left: 72, top: 52 }}>
-          <Img
-            src={staticFile("logo.png")}
-            style={{
-              width: 230,
-              display: "block",
-              opacity: logoIn,
-              transform: `translateY(${(1 - logoIn) * 20}px)`,
-            }}
-          />
+      <div style={{ position: "absolute", left: 72, top: 52 }}>
+        <Img
+          src={staticFile("logo.png")}
+          style={{
+            width: 230,
+            display: "block",
+            opacity: logoIn,
+            transform: `translateY(${(1 - logoIn) * 20}px)`,
+          }}
+        />
+        {config.hideText ? null : (
           <div
             style={{
               marginTop: 14,
@@ -1265,8 +1265,8 @@ export const SegmentScene: React.FC<{ config: SegmentConfig }> = ({
             <br />
             <span style={{ color: BRAND.green500 }}>{config.title[1]}</span>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {config.overlay?.({ frame, fps, fontFamily })}
 
