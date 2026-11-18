@@ -1,41 +1,7 @@
 @extends('layouts.site')
 
 @section('content')
-    {{-- Hero slider --}}
-    @if($banners->isNotEmpty())
-        <section x-data="{ i: 0, n: {{ $banners->count() }}, t: null, go(k){ this.i = (k + this.n) % this.n }, start(){ if(this.n>1) this.t = setInterval(() => this.go(this.i + 1), 6500) } }"
-                 x-init="start()" class="relative h-[85vh] min-h-[660px] overflow-hidden bg-brand-950 sm:min-h-[560px]">
-            @foreach($banners as $k => $b)
-                <div x-show="i === {{ $k }}" x-transition:enter="transition duration-700" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-                     x-transition:leave="transition duration-700" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-                     @if($k) x-cloak @endif class="absolute inset-0">
-                    <picture>
-                        @if($b->image_mobile)<source media="(max-width: 640px)" srcset="{{ media($b->image_mobile) }}">@endif
-                        <img src="{{ media($b->image) }}" alt="{{ $b->title }}" class="absolute inset-0 h-full w-full object-cover" @if($k) loading="lazy" @endif>
-                    </picture>
-                    <div class="absolute inset-0 bg-gradient-to-r from-brand-950/95 via-brand-950/70 to-brand-950/10"></div>
-                    <div class="container-x relative flex h-full items-center pb-20 sm:pb-10">
-                        <div class="max-w-3xl text-white">
-                            @if($b->subtitle)<p class="eyebrow">{{ $b->subtitle }}</p>@endif
-                            <h1 class="mt-3 text-[2rem] font-bold leading-tight text-white sm:text-5xl lg:text-[3.5rem]">{{ $b->title }}</h1>
-                            @if($b->description)<p class="mt-5 text-lg text-white/85">{{ $b->description }}</p>@endif
-                            <div class="mt-8 flex flex-wrap gap-3">
-                                @if($b->cta_label)<a href="{{ $b->cta_url ?: wa_link() }}" class="btn-accent px-6 py-3">{{ $b->cta_label }} <x-heroicon-m-arrow-right class="h-4 w-4"/></a>@endif
-                                @if($b->cta2_label)<a href="{{ $b->cta2_url ?: '#' }}" class="btn-ghost-light px-6 py-3">{{ $b->cta2_label }}</a>@endif
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-            @if($banners->count() > 1)
-                <div class="absolute bottom-8 left-1/2 flex -translate-x-1/2 gap-2">
-                    @foreach($banners as $k => $b)
-                        <button @click="go({{ $k }}); clearInterval(t); start()" :class="i === {{ $k }} ? 'w-8 bg-accent-500' : 'w-2.5 bg-white/50'" class="h-2.5 rounded-full transition-all" aria-label="Slide {{ $k + 1 }}"></button>
-                    @endforeach
-                </div>
-            @endif
-        </section>
-    @endif
+    @include('partials.hero')
 
     {{-- Stats --}}
     @if($stats = setting('stats'))

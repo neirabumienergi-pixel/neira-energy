@@ -12,7 +12,7 @@ class Segment extends Model
 
     protected $guarded = [];
 
-    protected $casts = ['examples' => 'array', 'seo' => 'array', 'is_active' => 'boolean'];
+    protected $casts = ['examples' => 'array', 'hero_points' => 'array', 'seo' => 'array', 'is_active' => 'boolean', 'show_in_hero' => 'boolean'];
 
     public function portfolios()
     {

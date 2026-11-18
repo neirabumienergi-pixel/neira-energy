@@ -131,22 +131,33 @@ class NeiraSeeder extends Seeder
             'og_image' => $this->asset('hero'),
             'keywords' => 'PLTS, EPC PLTS, panel surya, PJU tenaga surya, solar panel Indonesia',
         ]);
+        Setting::put('calculator', \App\Services\SolarCalculator::DEFAULTS);
         Setting::put('tracking', ['ga4' => null, 'gtm' => null, 'meta_pixel' => null]);
     }
 
     protected function segments(): array
     {
+        $hero = [
+            'Hunian' => ['Tagihan listrik rumah turun, nilai rumah naik', 'Paket PLTS rumah siap pasang lengkap dengan pengurusan izin PLN — tanpa repot.', ['Paket mulai 3 kWp', 'Termasuk NIDI & SLO', 'Monitoring via aplikasi', 'Garansi hingga 25 tahun'], 'residential', 'karawang-164'],
+            'Bisnis & Industri' => ['Pangkas biaya listrik operasional & capai target ESG', 'PLTS atap dan ground-mounted untuk pabrik, gudang, gedung, dan kantor — dirancang untuk payback tercepat.', ['Desain & simulasi produksi', 'Skema EPC atau kemitraan', 'Laporan reduksi CO₂', 'O&M berkala'], 'business', 'cikarang-504'],
+            'Proyek Pemerintah' => ['Mitra terpercaya untuk proyek energi pemerintah', 'Legalitas lengkap — SBU PLTS, IUJPTL, member AESI — untuk PLTS dan PJU tenaga surya instansi.', ['SBU PLTS & IUJPTL', 'PJU tenaga surya', 'Dokumen tender lengkap', 'Tim lapangan bersertifikat'], 'business', 'cibitung-2000'],
+            'Komunitas' => ['Energi bersih untuk desa, sekolah & nelayan', 'Solusi surya untuk program pemberdayaan: listrik desa, sekolah, puskesmas, pompa air, hingga perahu nelayan.', ['Off grid & hybrid', 'PLTS kapal nelayan', 'Pompa air tenaga surya', 'Pelatihan operator lokal'], 'business', 'kapal-2'],
+            'Kemitraan EPC' => ['Partner andal untuk developer & EPC', 'Supply material, fabrikasi, manpower bersertifikat, hingga engineering — skalakan proyek Anda bersama kami.', ['Material Tier-1 via Energy Mart', 'Fabrikasi custom', 'Manpower Adisurya', 'Dukungan engineering'], 'business', 'medan-4004'],
+        ];
         $rows = [
-            ['Kemitraan EPC', 'heroicon-o-puzzle-piece', 'Untuk developer, EPC, dan kontraktor', 'Dukungan engineering, supply material, fabrikasi, dan manpower untuk proyek mitra EPC dan developer.', ['Developer', 'EPC', 'Kontraktor MEP', 'Installer']],
+            ['Hunian', 'heroicon-o-home-modern', 'Untuk rumah & perumahan', 'Paket PLTS rumah tangga siap pasang — hemat tagihan listrik, termasuk pengurusan perizinan PLN.', ['Rumah tinggal', 'Villa', 'Perumahan']],
+            ['Bisnis & Industri', 'heroicon-o-building-office-2', 'Untuk pabrik, gedung, kantor', 'PLTS atap dan ground-mounted untuk menekan biaya listrik operasional dan mencapai target ESG perusahaan.', ['Pabrik', 'Gedung komersial', 'Kantor', 'Gudang', 'Hotel']],
             ['Proyek Pemerintah', 'heroicon-o-building-library', 'Untuk instansi & kontraktor pemerintah', 'PLTS dan PJU tenaga surya untuk instansi, BUMN/BUMD, dan kontraktor proyek pemerintah dengan legalitas lengkap.', ['Kementerian / Dinas', 'Pemda', 'BUMN / BUMD', 'Kontraktor pemerintah']],
             ['Komunitas', 'heroicon-o-users', 'Untuk NGO, desa, sekolah, kampus', 'Solusi energi surya untuk program pemberdayaan: listrik desa, sekolah, fasilitas kesehatan, perahu nelayan, dan pompa air.', ['NGO', 'Desa', 'Sekolah', 'Kampus', 'Pesantren']],
-            ['Bisnis & Industri', 'heroicon-o-building-office-2', 'Untuk pabrik, gedung, kantor', 'PLTS atap dan ground-mounted untuk menekan biaya listrik operasional dan mencapai target ESG perusahaan.', ['Pabrik', 'Gedung komersial', 'Kantor', 'Gudang', 'Hotel']],
-            ['Hunian', 'heroicon-o-home-modern', 'Untuk rumah & perumahan', 'Paket PLTS rumah tangga siap pasang — hemat tagihan listrik, termasuk pengurusan perizinan PLN.', ['Rumah tinggal', 'Villa', 'Perumahan']],
+            ['Kemitraan EPC', 'heroicon-o-puzzle-piece', 'Untuk developer, EPC, dan kontraktor', 'Dukungan engineering, supply material, fabrikasi, dan manpower untuk proyek mitra EPC dan developer.', ['Developer', 'EPC', 'Kontraktor MEP', 'Installer']],
         ];
         $out = [];
         foreach ($rows as $i => [$name, $icon, $tagline, $desc, $examples]) {
+            [$ht, $hx, $hp, $profile, $img] = $hero[$name];
             $out[$name] = Segment::updateOrCreate(['name' => $name], [
                 'icon' => $icon, 'tagline' => $tagline, 'short_description' => $desc, 'examples' => $examples, 'sort' => $i, 'is_active' => true,
+                'hero_title' => $ht, 'hero_text' => $hx, 'hero_points' => $hp, 'calc_profile' => $profile,
+                'hero_image' => $this->asset($img), 'image' => $this->asset($img), 'show_in_hero' => true,
             ]);
         }
 
@@ -252,7 +263,6 @@ class NeiraSeeder extends Seeder
 
     protected function packages(array $cats): void
     {
-        $tariff = 1444.70; // Rp/kWh R1 > 1300VA
         $pkg = function (ProductCategory $cat, string $name, float $cap, string $unit, ?float $price, array $extra = []) {
             return ProductPackage::updateOrCreate(['name' => $name], array_merge([
                 'product_category_id' => $cat->id, 'capacity' => $cap, 'capacity_unit' => $unit, 'base_price' => $price,
@@ -267,7 +277,7 @@ class NeiraSeeder extends Seeder
                 'sku' => 'ONG-'.str_pad($kwp, 3, '0', STR_PAD_LEFT), 'phase' => "{$ph} Phase", 'image' => $this->asset(['karawang-164', 'demak-64', 'boyolali-200', 'karawang-45', 'cikarang-508'][$i]),
                 'short_description' => "Sistem PLTS on grid {$kwp} kWp untuk ".($kwp <= 5 ? 'rumah tinggal' : 'bisnis & komersial').'.',
                 'est_production_kwh_month' => $prod, 'area_required_m2' => $kwp * 6,
-                'min_monthly_bill' => round($prod * $tariff * 0.6, -4), 'max_monthly_bill' => round($prod * $tariff * 1.6, -4),
+                'min_monthly_bill' => null, 'max_monthly_bill' => null, // kosong = rekomendasi otomatis berdasarkan kapasitas
                 'warranty' => 'Panel 12 th produk / 25 th performa, Inverter 5 th',
                 'is_featured' => in_array($kwp, [5, 20]),
                 'specifications' => [

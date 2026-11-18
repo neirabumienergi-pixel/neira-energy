@@ -48,6 +48,20 @@ class SegmentResource extends Resource
                 Fields::sort(),
                 Fields::active(),
             ])->columns(2),
+            Forms\Components\Section::make('Tampilan di hero beranda')
+                ->description('Muncul saat pengunjung memilih segmen ini di "Saya adalah…" pada beranda.')
+                ->schema([
+                    Forms\Components\Toggle::make('show_in_hero')->label('Tampilkan di hero')->default(true),
+                    Forms\Components\Select::make('calc_profile')->label('Profil kalkulator')->options(['residential' => 'Rumah (tarif & pola pemakaian rumah tangga)', 'business' => 'Bisnis / Instansi'])->default('business'),
+                    Forms\Components\TextInput::make('hero_title')->label('Judul hero')->placeholder('Kosong = "Solusi energi surya untuk {nama}"')->columnSpanFull(),
+                    Forms\Components\Textarea::make('hero_text')->label('Teks hero')->rows(2)->placeholder('Kosong = ringkasan segmen')->columnSpanFull(),
+                    Forms\Components\TagsInput::make('hero_points')->label('Poin keunggulan (maks. 4 disarankan)')->columnSpanFull(),
+                    Fields::image('hero_image', 'Gambar latar hero', 'segments'),
+                    Forms\Components\Grid::make(1)->schema([
+                        Forms\Components\TextInput::make('hero_cta_label')->label('Tombol – teks')->placeholder('Konsultasi gratis'),
+                        Forms\Components\TextInput::make('hero_cta_url')->label('Tombol – link')->placeholder('Kosong = WhatsApp dengan hasil kalkulator'),
+                    ])->columnSpan(1),
+                ])->columns(2)->collapsible(),
             Fields::seo(),
         ]);
     }

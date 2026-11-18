@@ -32,7 +32,7 @@ class CompanySettings extends Page implements HasForms
 
     protected static string $view = 'filament.pages.settings';
 
-    public const KEYS = ['company', 'contact', 'social', 'about', 'units', 'stats', 'seo', 'tracking'];
+    public const KEYS = ['company', 'contact', 'social', 'about', 'units', 'stats', 'calculator', 'seo', 'tracking'];
 
     public ?array $data = [];
 
@@ -116,6 +116,22 @@ class CompanySettings extends Page implements HasForms
                         $text('label', 'Keterangan')->required(),
                     ])->columns(3)->grid(2),
                 ]),
+                Forms\Components\Tabs\Tab::make('Kalkulator')->icon('heroicon-o-calculator')->schema([
+                    Forms\Components\Placeholder::make('calc_help')->hiddenLabel()->columnSpanFull()
+                        ->content('Asumsi untuk kalkulator hemat & simulasi surya di beranda. Rekomendasi diambil dari paket di kategori terpilih: paket dengan rentang tagihan yang cocok, atau paket dengan kapasitas terdekat. Kebutuhan > 1,5x paket terbesar dianggap proyek custom (pakai harga per kWp).'),
+                    Forms\Components\Select::make('calculator.category_id')->label('Kategori paket untuk rekomendasi')
+                        ->options(fn () => \App\Filament\Resources\ProductPackageResource::categoryOptions())->placeholder('Otomatis: PLTS On Grid'),
+                    $text('calculator.price_per_kwp', 'Harga per kWp (jika tidak ada paket cocok)')->numeric()->prefix('Rp'),
+                    $text('calculator.tariff_residential', 'Tarif listrik rumah')->numeric()->prefix('Rp')->suffix('/kWh'),
+                    $text('calculator.tariff_business', 'Tarif listrik bisnis / instansi')->numeric()->prefix('Rp')->suffix('/kWh'),
+                    $text('calculator.offset_residential', 'Porsi kebutuhan ditanggung PLTS – rumah')->numeric()->step(0.05)->helperText('0–1. Rumah banyak memakai listrik malam, mis. 0,6'),
+                    $text('calculator.offset_business', 'Porsi kebutuhan ditanggung PLTS – bisnis')->numeric()->step(0.05)->helperText('0–1, mis. 0,8'),
+                    $text('calculator.psh', 'Peak sun hours')->numeric()->step(0.1)->suffix('jam/hari'),
+                    $text('calculator.performance_ratio', 'Performance ratio')->numeric()->step(0.01),
+                    $text('calculator.emission_factor', 'Faktor emisi grid')->numeric()->step(0.01)->suffix('kg CO₂/kWh'),
+                    $text('calculator.min_bill', 'Slider tagihan – minimum')->numeric()->prefix('Rp'),
+                    $text('calculator.max_bill', 'Slider tagihan – maksimum')->numeric()->prefix('Rp'),
+                ])->columns(2),
                 Forms\Components\Tabs\Tab::make('SEO & Tracking')->icon('heroicon-o-magnifying-glass')->schema([
                     $text('seo.meta_title', 'Meta title default')->columnSpanFull(),
                     Forms\Components\Textarea::make('seo.meta_description')->label('Meta description default')->rows(2)->columnSpanFull(),

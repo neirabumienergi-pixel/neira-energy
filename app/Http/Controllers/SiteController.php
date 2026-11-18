@@ -16,14 +16,35 @@ use App\Models\ProductPackage;
 use App\Models\Promo;
 use App\Models\Segment;
 use App\Models\Testimonial;
+use App\Services\SolarCalculator;
 use Illuminate\Http\Request;
 
 class SiteController extends Controller
 {
-    public function home()
+    public function home(SolarCalculator $calculator)
     {
+        $banners = Banner::live()->ordered()->get();
+        $heroSegments = Segment::active()->where('show_in_hero', true)->ordered()->get();
+
         return view('site.home', [
-            'banners' => Banner::live()->ordered()->get(),
+            'banners' => $banners,
+            'hero' => [
+                'banners' => $banners->map(fn ($b) => ['image' => media($b->image)])->values(),
+                'segments' => $heroSegments->map(fn (Segment $s) => [
+                    'slug' => $s->slug, 'name' => $s->name, 'tagline' => $s->tagline,
+                    'icon' => $this->svg($s->icon, 'heroicon-o-bolt'),
+                    'title' => $s->hero_title ?: 'Solusi energi surya untuk '.$s->name,
+                    'text' => $s->hero_text ?: $s->short_description,
+                    'points' => array_values(array_filter($s->hero_points ?? [])),
+                    'image' => media($s->hero_image ?: $s->image),
+                    'cta_label' => $s->hero_cta_label ?: 'Konsultasi gratis',
+                    'cta_url' => $s->hero_cta_url,
+                    'profile' => $s->calc_profile ?: 'business',
+                    'url' => route('segments.show', $s),
+                ])->values(),
+                'calc' => $calculator->frontendPayload(),
+                'waNumber' => preg_replace('/\D/', '', (string) setting('contact.whatsapp')),
+            ],
             'categories' => ProductCategory::active()->whereNull('parent_id')->ordered()->with(['children' => fn ($q) => $q->where('is_active', true)])->get(),
             'segments' => Segment::active()->ordered()->get(),
             'featuredPackages' => ProductPackage::active()->where('is_featured', true)->with('category')->ordered()->take(6)->get(),
@@ -216,5 +237,17 @@ class SiteController extends Controller
         Page::active()->get()->each(fn ($p) => $urls->push(route('page.show', $p)));
 
         return response()->view('site.sitemap', ['urls' => $urls], 200)->header('Content-Type', 'application/xml');
+    }
+
+    protected function svg(?string $name, string $fallback): string
+    {
+        foreach (array_filter([$name, $fallback]) as $n) {
+            try {
+                return svg($n, 'h-4 w-4')->toHtml();
+            } catch (\Throwable) {
+            }
+        }
+
+        return '';
     }
 }

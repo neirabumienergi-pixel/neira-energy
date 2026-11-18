@@ -87,7 +87,7 @@ class ProductPackageResource extends Resource
                     $money('base_price', 'Harga paket'),
                     $money('strike_price', 'Harga coret (opsional)'),
                     Forms\Components\TextInput::make('price_note')->label('Catatan harga')->placeholder('Belum termasuk PPN 11%'),
-                    Forms\Components\Fieldset::make('Rekomendasi kalkulator')->schema([
+                    Forms\Components\Fieldset::make('Rekomendasi kalkulator (opsional – kosong = otomatis dari kapasitas)')->schema([
                         $money('min_monthly_bill', 'Tagihan listrik min / bulan'),
                         $money('max_monthly_bill', 'Tagihan listrik maks / bulan'),
                     ])->columns(2),

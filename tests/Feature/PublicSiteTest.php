@@ -30,6 +30,18 @@ class PublicSiteTest extends TestCase
         }
     }
 
+    public function test_home_hero_contains_segments_and_calculator_data(): void
+    {
+        \App\Models\Segment::where('name', 'Komunitas')->update(['hero_title' => 'Judul hero komunitas uji', 'show_in_hero' => true]);
+        \App\Models\Segment::where('name', 'Kemitraan EPC')->update(['show_in_hero' => false]);
+
+        $this->get('/')->assertOk()
+            ->assertSee('solarHero', false)
+            ->assertSee('Judul hero komunitas uji')
+            ->assertSee('PLTS On Grid 10 kWp')
+            ->assertDontSee('Partner andal untuk developer');
+    }
+
     public function test_package_page_shows_admin_managed_data(): void
     {
         $pkg = ProductPackage::with('category')->where('name', 'PLTS On Grid 5 kWp')->first();
